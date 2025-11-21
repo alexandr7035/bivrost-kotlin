@@ -1,19 +1,29 @@
 package pm.gnosis.model
 
-import com.squareup.moshi.Json
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-class AbiRoot(@Json(name = "abi") val abi: List<AbiElementJson>,
-              @Json(name = "contractName") val contractName: String)
+@Serializable
+class AbiRoot(
+    @SerialName("abi") val abi: List<AbiElementJson>,
+    @SerialName("contractName") val contractName: String
+)
 
-class AbiElementJson(@Json(name = "constant") val constant: Boolean = false,
-                     @Json(name = "inputs") val inputs: List<ParameterJson> = listOf(),
-                     @Json(name = "name") val name: String = "",
-                     @Json(name = "outputs") val outputs: List<ParameterJson> = listOf(),
-                     @Json(name = "payable") val payable: Boolean = false,
-                     @Json(name = "type") val type: String = "function",
-                     @Json(name = "anonymous") val anonymous: Boolean = false)
+@Serializable
+class AbiElementJson(
+    @SerialName("constant") val constant: Boolean = false,
+    @SerialName("inputs") val inputs: List<ParameterJson> = emptyList(),
+    @SerialName("name") val name: String = "",
+    @SerialName("outputs") val outputs: List<ParameterJson> = emptyList(),
+    @SerialName("payable") val payable: Boolean = false,
+    @SerialName("type") val type: String = "function",
+    @SerialName("anonymous") val anonymous: Boolean = false
+)
 
-class ParameterJson(@Json(name = "name") val name: String,
-                    @Json(name = "type") val type: String,
-                    @Json(name = "components") val components: List<ParameterJson>? = null,
-                    @Json(name = "indexed") val indexed: Boolean = false)
+@Serializable
+class ParameterJson(
+    @SerialName("name") val name: String,
+    @SerialName("type") val type: String,
+    @SerialName("components") val components: List<ParameterJson>? = null,
+    @SerialName("indexed") val indexed: Boolean = false
+)

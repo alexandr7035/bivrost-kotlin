@@ -2,8 +2,7 @@ package pm.gnosis
 
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import kotlinx.serialization.json.Json
 import pm.gnosis.model.*
 import pm.gnosis.utils.BigIntegerUtils
 import pm.gnosis.utils.generateSolidityMethodId
@@ -20,8 +19,8 @@ object AbiParser {
     internal lateinit var context: GeneratorContext
 
     fun generateWrapper(packageName: String, abi: String, output: File, arraysMap: ArraysMap) {
-        val jsonAdapter = Moshi.Builder().add(KotlinJsonAdapterFactory()).build().adapter(AbiRoot::class.java)
-        val abiRoot = jsonAdapter.fromJson(abi) ?: return
+        val json = Json { ignoreUnknownKeys = true }
+        val abiRoot = json.decodeFromString<AbiRoot>(abi)
         context = GeneratorContext(abiRoot, arraysMap)
 
         val kotlinClass = TypeSpec.classBuilder(abiRoot.contractName)
