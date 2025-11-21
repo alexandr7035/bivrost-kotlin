@@ -2,12 +2,10 @@ package expected
 
 import kotlin.String
 
-class Abi5 {
-    object Function {
-        const val METHOD_ID: String = "9d96e2df"
+public class Abi5 {
+    public object Function {
+        public const val METHOD_ID: String = "9d96e2df"
 
-        fun encode(): String {
-            return "0x" + METHOD_ID
-        }
+        public fun encode(): String = "0x" + METHOD_ID
     }
 }

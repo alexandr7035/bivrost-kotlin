@@ -7,15 +7,13 @@ import pm.gnosis.model.Solidity
 import pm.gnosis.model.SolidityBase
 import pm.gnosis.utils.BigIntegerUtils
 
-class Abi16 {
-    object Malformed {
-        const val METHOD_ID: String = "a76411a9"
+public class Abi16 {
+    public object Malformed {
+        public const val METHOD_ID: String = "a76411a9"
 
-        fun encode(c: TupleA): String {
-            return "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(c)
-        }
+        public fun encode(c: TupleA): String = "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(c)
 
-        fun decodeArguments(data: String): Arguments {
+        public fun decodeArguments(`data`: String): Arguments {
             val source = SolidityBase.PartitionData.of(data)
 
             // Add decoders
@@ -25,25 +23,22 @@ class Abi16 {
             return Arguments(arg0)
         }
 
-        data class Arguments(
-            val c: TupleA
+        public data class Arguments(
+            public val c: TupleA,
         )
     }
 
-    data class TupleA(
-        val bytesvar: Solidity.Bytes,
-        val stringvar: Solidity.String
+    public data class TupleA(
+        public val bytesvar: Solidity.Bytes,
+        public val stringvar: Solidity.String,
     ) : SolidityBase.DynamicType {
-        override fun encode(): String {
-            return SolidityBase.encodeFunctionArguments(bytesvar, stringvar)
-        }
+        override fun encode(): String = SolidityBase.encodeFunctionArguments(bytesvar, stringvar)
 
-        override fun encodePacked(): String {
-            throw UnsupportedOperationException("Structs are  not supported via encodePacked")
-        }
+        override fun encodePacked(): String = throw UnsupportedOperationException("Structs are  not supported via encodePacked")
 
-        class Decoder : SolidityBase.TypeDecoder<TupleA> {
+        public class Decoder : SolidityBase.TypeDecoder<TupleA> {
             override fun isDynamic(): Boolean = true
+
             override fun decode(source: SolidityBase.PartitionData): TupleA {
                 val arg0Offset = BigIntegerUtils.exact(BigInteger(source.consume(), 16))
                 val arg0 = Solidity.Bytes.DECODER.decode(source.subData(arg0Offset))
@@ -53,8 +48,8 @@ class Abi16 {
             }
         }
 
-        companion object {
-            val DECODER: Decoder = Decoder()
+        public companion object {
+            public val DECODER: Decoder = Decoder()
         }
     }
 }

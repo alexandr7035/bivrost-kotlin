@@ -4,15 +4,13 @@ import kotlin.String
 import pm.gnosis.model.Solidity
 import pm.gnosis.model.SolidityBase
 
-class Abi6 {
-    object Function {
-        const val METHOD_ID: String = "06da0736"
+public class Abi6 {
+    public object Function {
+        public const val METHOD_ID: String = "06da0736"
 
-        fun encode(owner: Solidity.Address): String {
-            return "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(owner)
-        }
+        public fun encode(owner: Solidity.Address): String = "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(owner)
 
-        fun decodeArguments(data: String): Arguments {
+        public fun decodeArguments(`data`: String): Arguments {
             val source = SolidityBase.PartitionData.of(data)
 
             // Add decoders
@@ -21,8 +19,8 @@ class Abi6 {
             return Arguments(arg0)
         }
 
-        data class Arguments(
-            val owner: Solidity.Address
+        public data class Arguments(
+            public val owner: Solidity.Address,
         )
     }
 }

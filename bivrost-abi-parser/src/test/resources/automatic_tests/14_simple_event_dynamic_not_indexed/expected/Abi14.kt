@@ -8,13 +8,13 @@ import pm.gnosis.model.Solidity
 import pm.gnosis.model.SolidityBase
 import pm.gnosis.utils.BigIntegerUtils
 
-class Abi14 {
-    object Events {
-        object Submission {
-            const val EVENT_ID: String =
+public class Abi14 {
+    public object Events {
+        public object Submission {
+            public const val EVENT_ID: String =
                     "0c5212e9d002fa3e0c9bd8c78b6d4df3e94f4e956761bd40f0859c979600a2e7"
 
-            fun decode(topics: List<String>, data: String): Arguments {
+            public fun decode(topics: List<String>, `data`: String): Arguments {
                 // Decode topics
                 if (topics.first().removePrefix("0x") != EVENT_ID) throw IllegalArgumentException("topics[0] does not match event id")
 
@@ -28,28 +28,25 @@ class Abi14 {
                 return Arguments(arg0, arg1, arg2)
             }
 
-            data class Arguments(
-                val bytes: Solidity.Bytes,
-                val string: Solidity.String,
-                val tuple: TupleA
+            public data class Arguments(
+                public val bytes: Solidity.Bytes,
+                public val string: Solidity.String,
+                public val tuple: TupleA,
             )
         }
     }
 
-    data class TupleA(
-        val x: Solidity.UInt256,
-        val y: Solidity.UInt256
+    public data class TupleA(
+        public val x: Solidity.UInt256,
+        public val y: Solidity.UInt256,
     ) : SolidityBase.StaticType {
-        override fun encode(): String {
-            return SolidityBase.encodeFunctionArguments(x, y)
-        }
+        override fun encode(): String = SolidityBase.encodeFunctionArguments(x, y)
 
-        override fun encodePacked(): String {
-            throw UnsupportedOperationException("Structs are  not supported via encodePacked")
-        }
+        override fun encodePacked(): String = throw UnsupportedOperationException("Structs are  not supported via encodePacked")
 
-        class Decoder : SolidityBase.TypeDecoder<TupleA> {
+        public class Decoder : SolidityBase.TypeDecoder<TupleA> {
             override fun isDynamic(): Boolean = false
+
             override fun decode(source: SolidityBase.PartitionData): TupleA {
                 val arg0 = Solidity.UInt256.DECODER.decode(source)
                 val arg1 = Solidity.UInt256.DECODER.decode(source)
@@ -57,8 +54,8 @@ class Abi14 {
             }
         }
 
-        companion object {
-            val DECODER: Decoder = Decoder()
+        public companion object {
+            public val DECODER: Decoder = Decoder()
         }
     }
 }

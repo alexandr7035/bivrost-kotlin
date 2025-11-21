@@ -1,3 +1,3 @@
 package expected
 
-class Abi4
+public class Abi4

@@ -9,17 +9,13 @@ import pm.gnosis.model.Solidity
 import pm.gnosis.model.SolidityBase
 import pm.gnosis.utils.BigIntegerUtils
 
-class Abi9 {
-    object Owners {
-        const val METHOD_ID: String = "9f767eb7"
+public class Abi9 {
+    public object Owners {
+        public const val METHOD_ID: String = "9f767eb7"
 
-        fun encode(c: SolidityBase.Vector<TupleA>,
-                arg2: SolidityBase.Vector<SolidityBase.Vector<Array7<Array5<Solidity.UInt256>>>>):
-                String {
-            return "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(c, arg2)
-        }
+        public fun encode(c: SolidityBase.Vector<TupleA>, arg2: SolidityBase.Vector<SolidityBase.Vector<Array7<Array5<Solidity.UInt256>>>>): String = "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(c, arg2)
 
-        fun decode(data: String): Return {
+        public fun decode(`data`: String): Return {
             val source = SolidityBase.PartitionData.of(data)
 
             // Add decoders
@@ -30,7 +26,7 @@ class Abi9 {
             return Return(arg0, arg1)
         }
 
-        fun decodeArguments(data: String): Arguments {
+        public fun decodeArguments(`data`: String): Arguments {
             val source = SolidityBase.PartitionData.of(data)
 
             // Add decoders
@@ -42,32 +38,31 @@ class Abi9 {
             return Arguments(arg0, arg1)
         }
 
-        data class Return(
-            val param0: TupleB,
-            val param1: SolidityBase.Vector<TupleB>
+        public data class Return(
+            public val param0: TupleB,
+            public val param1: SolidityBase.Vector<TupleB>,
         )
 
-        data class Arguments(
-            val c: SolidityBase.Vector<TupleA>,
-            val param1: SolidityBase.Vector<SolidityBase.Vector<Array7<Array5<Solidity.UInt256>>>>
+        public data class Arguments(
+            public val c: SolidityBase.Vector<TupleA>,
+            public val param1:
+                    SolidityBase.Vector<SolidityBase.Vector<Array7<Array5<Solidity.UInt256>>>>,
         )
     }
 
-    data class TupleA(
-        val a: Solidity.UInt256,
-        val b: Solidity.UInt256,
-        val param2: SolidityBase.Vector<SolidityBase.Vector<Array7<Array5<Solidity.UInt256>>>>
+    public data class TupleA(
+        public val a: Solidity.UInt256,
+        public val b: Solidity.UInt256,
+        public val param2:
+                SolidityBase.Vector<SolidityBase.Vector<Array7<Array5<Solidity.UInt256>>>>,
     ) : SolidityBase.DynamicType {
-        override fun encode(): String {
-            return SolidityBase.encodeFunctionArguments(a, b, param2)
-        }
+        override fun encode(): String = SolidityBase.encodeFunctionArguments(a, b, param2)
 
-        override fun encodePacked(): String {
-            throw UnsupportedOperationException("Structs are  not supported via encodePacked")
-        }
+        override fun encodePacked(): String = throw UnsupportedOperationException("Structs are  not supported via encodePacked")
 
-        class Decoder : SolidityBase.TypeDecoder<TupleA> {
+        public class Decoder : SolidityBase.TypeDecoder<TupleA> {
             override fun isDynamic(): Boolean = true
+
             override fun decode(source: SolidityBase.PartitionData): TupleA {
                 val arg0 = Solidity.UInt256.DECODER.decode(source)
                 val arg1 = Solidity.UInt256.DECODER.decode(source)
@@ -77,25 +72,22 @@ class Abi9 {
             }
         }
 
-        companion object {
-            val DECODER: Decoder = Decoder()
+        public companion object {
+            public val DECODER: Decoder = Decoder()
         }
     }
 
-    data class TupleB(
-        val x: Solidity.UInt256,
-        val y: Solidity.UInt256
+    public data class TupleB(
+        public val x: Solidity.UInt256,
+        public val y: Solidity.UInt256,
     ) : SolidityBase.StaticType {
-        override fun encode(): String {
-            return SolidityBase.encodeFunctionArguments(x, y)
-        }
+        override fun encode(): String = SolidityBase.encodeFunctionArguments(x, y)
 
-        override fun encodePacked(): String {
-            throw UnsupportedOperationException("Structs are  not supported via encodePacked")
-        }
+        override fun encodePacked(): String = throw UnsupportedOperationException("Structs are  not supported via encodePacked")
 
-        class Decoder : SolidityBase.TypeDecoder<TupleB> {
+        public class Decoder : SolidityBase.TypeDecoder<TupleB> {
             override fun isDynamic(): Boolean = false
+
             override fun decode(source: SolidityBase.PartitionData): TupleB {
                 val arg0 = Solidity.UInt256.DECODER.decode(source)
                 val arg1 = Solidity.UInt256.DECODER.decode(source)
@@ -103,8 +95,8 @@ class Abi9 {
             }
         }
 
-        companion object {
-            val DECODER: Decoder = Decoder()
+        public companion object {
+            public val DECODER: Decoder = Decoder()
         }
     }
 }

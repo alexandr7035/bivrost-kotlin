@@ -1,3 +1,3 @@
 package expected
 
-class EmptyContract
+public class EmptyContract

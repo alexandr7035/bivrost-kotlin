@@ -6,15 +6,13 @@ import pm.gnosis.model.Solidity
 import pm.gnosis.model.SolidityBase
 import pm.gnosis.utils.BigIntegerUtils
 
-class Abi7 {
-    object Function {
-        const val METHOD_ID: String = "06da0736"
+public class Abi7 {
+    public object Function {
+        public const val METHOD_ID: String = "06da0736"
 
-        fun encode(owner: Solidity.Address): String {
-            return "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(owner)
-        }
+        public fun encode(owner: Solidity.Address): String = "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(owner)
 
-        fun decode(data: String): Return {
+        public fun decode(`data`: String): Return {
             val source = SolidityBase.PartitionData.of(data)
 
             // Add decoders
@@ -24,7 +22,7 @@ class Abi7 {
             return Return(arg0)
         }
 
-        fun decodeArguments(data: String): Arguments {
+        public fun decodeArguments(`data`: String): Arguments {
             val source = SolidityBase.PartitionData.of(data)
 
             // Add decoders
@@ -33,12 +31,12 @@ class Abi7 {
             return Arguments(arg0)
         }
 
-        data class Return(
-            val data: Solidity.Bytes
+        public data class Return(
+            public val `data`: Solidity.Bytes,
         )
 
-        data class Arguments(
-            val owner: Solidity.Address
+        public data class Arguments(
+            public val owner: Solidity.Address,
         )
     }
 }
