@@ -12,7 +12,7 @@ buildTools = "28.0.3"
 kotlinPoet = "2.2.0"
 kotlinxSerialization = "1.8.1"
 junit = "4.13.2"
-bouncycastle = "1.78.1"
+kotlincrypto = "0.8.0"
 
 [libraries]
 # Kotlin
@@ -26,7 +26,8 @@ kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 
 # Cryptography
-bouncycastle = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
+kotlincrypto-bom = { module = "org.kotlincrypto.hash:bom", version.ref = "kotlincrypto" }
+kotlincrypto-sha3 = { module = "org.kotlincrypto.hash:sha3", version.ref = "kotlincrypto" }
 
 # Testing
 junit = { module = "junit:junit", version.ref = "junit" }

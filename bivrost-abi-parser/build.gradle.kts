@@ -10,8 +10,12 @@ dependencies {
     implementation(project(":bivrost-solidity-types"))
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlinx.serialization.json)
+
     implementation(libs.kotlinpoet)
-    implementation(libs.bouncycastle)
+
+    implementation(platform(libs.kotlincrypto.bom))
+    implementation(libs.kotlincrypto.sha3)
+
     testImplementation(libs.junit)
 }
 

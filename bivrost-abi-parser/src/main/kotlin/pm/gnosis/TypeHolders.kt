@@ -4,7 +4,7 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asClassName
-import org.bouncycastle.crypto.digests.KeccakDigest
+import org.kotlincrypto.hash.sha3.Keccak256
 import pm.gnosis.model.ParameterJson
 import pm.gnosis.model.Solidity
 import pm.gnosis.model.SolidityBase
@@ -137,12 +137,11 @@ private fun numberToLetter(index: Int): String {
 }
 
 private fun generateHash(parts: List<String>): String {
-    val digest = KeccakDigest()
+    val digest = Keccak256()
     parts.forEach {
         val bytes = it.toByteArray()
-        digest.update(bytes, 0, bytes.size)
+        digest.update(bytes)
     }
-    val hash = ByteArray(digest.digestSize)
-    digest.doFinal(hash, 0)
+    val hash = digest.digest()
     return hash.toHex()
 }
