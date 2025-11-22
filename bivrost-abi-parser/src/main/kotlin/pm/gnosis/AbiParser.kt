@@ -107,7 +107,7 @@ object AbiParser {
 
                 //Add method id
                 val methodId = "${functionJson.name}${generateMethodSignature(functionJson.inputs)}".generateSolidityMethodId()
-                val baseName = functionJson.name.capitalize()
+                val baseName = functionJson.name.replaceFirstChar { it.uppercaseChar() }
                 val name = if (useMethodId) "${baseName}_$methodId" else baseName
                 val functionObject = TypeSpec.objectBuilder(name)
 
@@ -257,7 +257,7 @@ object AbiParser {
         val returnContainerConstructor = FunSpec.constructorBuilder()
 
         parameters.forEachIndexed { index, parameterJson ->
-            val name = if (parameterJson.name.isEmpty()) "param$index" else parameterJson.name.toLowerCase()
+            val name = if (parameterJson.name.isEmpty()) "param$index" else parameterJson.name.lowercase()
             val className = mapType(parameterJson, context).toTypeName()
             returnContainerConstructor.addParameter(name, className)
             returnContainerBuilder.addProperty(PropertySpec.builder(name, className).initializer(name).build())

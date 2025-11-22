@@ -38,7 +38,7 @@ internal class SimpleTypeHolder private constructor(private val className: Class
          */
         fun forType(type: String): SimpleTypeHolder? {
             val baseType = Solidity.types[checkType(type)] ?: return null
-            return SimpleTypeHolder(ClassName.bestGuess(baseType), SolidityBase.dynamicTypes.contains(type.toLowerCase()))
+            return SimpleTypeHolder(ClassName.bestGuess(baseType), SolidityBase.dynamicTypes.contains(type.lowercase()))
         }
     }
 }
@@ -97,7 +97,7 @@ private fun generateTuple(type: String, parameters: ParameterJson, context: AbiP
         return null
     }
     val entries = parameters.components.mapIndexed { index, param ->
-        Pair(if (param.name.isEmpty()) "param$index" else param.name.toLowerCase(), mapType(param, context))
+        Pair(if (param.name.isEmpty()) "param$index" else param.name.lowercase(), mapType(param, context))
     }
     val tupleTypeHolder = TupleTypeHolder(context.tuples.size, entries)
     return context.tuples.getOrPut(tupleTypeHolder.hash()) { tupleTypeHolder }

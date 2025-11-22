@@ -1,6 +1,6 @@
 [versions]
 # Build tools
-kotlin = "2.0.21"
+kotlin = "2.2.0"
 androidPlugin = "3.3.0"
 
 # Android SDK

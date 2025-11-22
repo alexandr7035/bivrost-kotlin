@@ -63,7 +63,7 @@ fun generate(path: String, packageName: String) {
 
     // Generate type map
     val typeMapContent = (uInts + ints + staticBytes + address + bool + dynamicBytes + string)
-            .map { it.name?.toLowerCase() to it.name }
+            .map { it.name?.lowercase() to it.name }
             .joinToString(",\n") { "\"${it.first}\" to \"$modelPackageName.$fileName.${it.second}\"" }
 
     val typeMapBlock = CodeBlock.builder().add(CodeBlock.of("mapOf(\n$typeMapContent)"))

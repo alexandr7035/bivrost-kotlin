@@ -30,7 +30,7 @@ internal object EventParser {
     }
 
     private fun generateEventObject(abiElementJson: AbiElementJson): TypeSpec {
-        val eventObject = TypeSpec.objectBuilder(abiElementJson.name.capitalize())
+        val eventObject = TypeSpec.objectBuilder(abiElementJson.name.replaceFirstChar { it.uppercaseChar() })
 
         val eventId = "${abiElementJson.name}(${abiElementJson.inputs.joinToString(",") { it.type }})".keccak256()
         eventObject.addProperty(PropertySpec.builder(EVENT_ID_PROPERTY_NAME, String::class, KModifier.CONST).initializer("\"$eventId\"").build())
@@ -126,11 +126,11 @@ internal object EventParser {
         val returnContainerConstructor = FunSpec.constructorBuilder()
 
         parameters.forEachIndexed { index, parameterJson ->
-            var name = if (parameterJson.name.isEmpty()) "param$index" else parameterJson.name.toLowerCase()
+            var name = if (parameterJson.name.isEmpty()) "param$index" else parameterJson.name.lowercase()
 
             val typeHolder = mapType(parameterJson, context)
             val className = if (typeHolder.isHashTopic(parameterJson)) {
-                name = if (parameterJson.name.isEmpty()) "param${index}Hash" else "${parameterJson.name.toLowerCase()}Hash"
+                name = if (parameterJson.name.isEmpty()) "param${index}Hash" else "${parameterJson.name.lowercase()}Hash"
                 ClassName.bestGuess("kotlin.String")
             } else {
                 typeHolder.toTypeName()
