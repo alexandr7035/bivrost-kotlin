@@ -6,11 +6,11 @@ pluginManagement {
     }
 }
 
-rootProject.name = "bivrost-kotlin"
+rootProject.name = "bivkmp"
 
-include(":bivrost-abi-parser")
-include(":bivrost-gradle-plugin")
-include(":bivrost-solidity-types")
-include(":bivrost-solidity-types-generator")
-include(":bivrost-utils")
+include(":bivkmp-abi-parser")
+include(":bivkmp-gradle-plugin")
+include(":bivkmp-solidity-types")
+include(":bivkmp-solidity-types-generator")
+include(":bivkmp-utils")
 //include(":sample:app")

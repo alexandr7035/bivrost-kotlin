@@ -11,11 +11,11 @@ buildscript {
     }
 
     dependencies {
-        classpath "pm.gnosis:bivrost-gradle-plugin:0.0.42"
+        classpath "by.alexandr7035:bivkmp-gradle-plugin:0.1"
     }
 }
 
-apply plugin: "bivrost"
+apply plugin: "bivkmp"
 
 android {
     compileSdkVersion versions.compileSdk
@@ -60,5 +60,5 @@ repositories {
 
 dependencies {
     implementation deps.kotlin.stdLibJre8
-    implementation "pm.gnosis:bivrost-solidity-types:0.0.42"
+    implementation "by.alexandr7035:bivkmp-solidity-types:0.1"
 }

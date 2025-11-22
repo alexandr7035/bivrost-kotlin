@@ -1,41 +1,25 @@
-### Bivrost for Kotlin
+~### BivKMP-Solidity
 
-🔥 🌈 Bridge between Solidity Contracts and Kotlin
+A refreshed fork of [Gnosis's Bivrost](https://github.com/5afe/bivrost-kotlin) - Bridge between Solidity Contracts and Kotlin
 
-[![](https://jitpack.io/v/gnosis/bivrost-kotlin.svg)](https://jitpack.io/#gnosis/bivrost-kotlin)
-[![Build Status](https://travis-ci.org/gnosis/bivrost-kotlin.svg?branch=master)](https://travis-ci.org/gnosis/bivrost-kotlin)
+## TODO usage examples
 
-#### Include via jitpack
+#### Setup
+* TODO library setup steps
 
-* Add jitpack repository (see https://www.jitpack.io/#gnosis/bivrost-kotlin)
-
-* Add classpath dependency:
-```
-classpath ('com.github.gnosis.bivrost-kotlin:bivrost-gradle-plugin:<version>')
-```
-
-* Add runtime dependency:
-```
-implementation ('com.github.gnosis.abi-kotlin:bivrost-solidity-types:<version>')
-```
-
-* Apply plugin:
-```
-apply plugin: 'bivrost'
-```
+* TODO Apply plugin
 
 * Add abi json to project in `app/abi` folder (see sample app)
 
 
-
-#### Setup of Sample App
+#### TODO Setup of Sample App
 * Optional: Generate the Solidity types:
-  - `./gradlew :bivrost-solidity-types-generator:runSolidityTypeGenerator`
+  - `./gradlew :bivkmp-solidity-types-generator:runSolidityTypeGenerator`
 * Add library artifacts to local maven:
-  - `./gradlew :bivrost-utils:uploadArchives`
-  - `./gradlew :bivrost-solidity-types:uploadArchives`
-  - `./gradlew :bivrost-abi-parser:uploadArchives`
-  - `./gradlew :bivrost-gradle-plugin:uploadArchives`
+  - `./gradlew :bivkmp-utils:uploadArchives`
+  - `./gradlew :bivkmp-solidity-types:uploadArchives`
+  - `./gradlew :bivkmp-abi-parser:uploadArchives`
+  - `./gradlew :bivkmp-gradle-plugin:uploadArchives`
   
 * Uncomment `include ':sample:app'` in the `settings.gradle` to include sample app module.
 

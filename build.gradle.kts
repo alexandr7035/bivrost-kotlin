@@ -8,8 +8,8 @@ fun getKey(name: String, defaultValue: String? = null): String {
 }
 
 subprojects {
-    group = "pm.gnosis"
-    version = getKey("LIBRARY_VERSION", "0.0.42")
+    group = "by.alexandr7035"
+    version = getKey("LIBRARY_VERSION", "0.1")
 
     repositories {
         mavenCentral()
