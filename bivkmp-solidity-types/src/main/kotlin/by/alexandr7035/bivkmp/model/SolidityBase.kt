@@ -6,7 +6,7 @@ import by.alexandr7035.bivkmp.utils.padStartMultiple
 import by.alexandr7035.bivkmp.utils.toHex
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.integer.BigInteger
-import java.nio.charset.Charset
+import kotlin.text.Charsets
 import kotlin.collections.ArrayList
 
 object SolidityBase {
@@ -375,7 +375,7 @@ object SolidityBase {
     }
 
     fun decodeString(source: PartitionData) =
-            decodeBytes(source).toString(Charset.forName("UTF-8"))
+            decodeBytes(source).toString(Charsets.UTF_8)
 
     @Deprecated("Deprecated for decodeList")
     fun <T : Any> decodeArray(data: String, itemDecoder: (String) -> T): List<T> {
