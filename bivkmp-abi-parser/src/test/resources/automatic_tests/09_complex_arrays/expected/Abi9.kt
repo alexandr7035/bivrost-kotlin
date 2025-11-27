@@ -2,10 +2,9 @@ package expected
 
 import `by`.alexandr7035.bivkmp.model.Solidity
 import `by`.alexandr7035.bivkmp.model.SolidityBase
-import `by`.alexandr7035.bivkmp.utils.BigIntegerUtils
+import com.ionspin.kotlin.bignum.integer.BigInteger
 import expected.arrays.Array5
 import expected.arrays.Array7
-import java.math.BigInteger
 import kotlin.Boolean
 import kotlin.String
 
@@ -20,7 +19,7 @@ public class Abi9 {
 
             // Add decoders
             val arg0 = TupleB.DECODER.decode(source)
-            val arg1Offset = BigIntegerUtils.exact(BigInteger(source.consume(), 16))
+            val arg1Offset = BigInteger.parseString(source.consume(), 16).intValue(exactRequired = true)
             val arg1 = SolidityBase.Vector.Decoder(TupleB.DECODER).decode(source.subData(arg1Offset))
 
             return Return(arg0, arg1)
@@ -30,9 +29,9 @@ public class Abi9 {
             val source = SolidityBase.PartitionData.of(data)
 
             // Add decoders
-            val arg0Offset = BigIntegerUtils.exact(BigInteger(source.consume(), 16))
+            val arg0Offset = BigInteger.parseString(source.consume(), 16).intValue(exactRequired = true)
             val arg0 = SolidityBase.Vector.Decoder(TupleA.DECODER).decode(source.subData(arg0Offset))
-            val arg1Offset = BigIntegerUtils.exact(BigInteger(source.consume(), 16))
+            val arg1Offset = BigInteger.parseString(source.consume(), 16).intValue(exactRequired = true)
             val arg1 = SolidityBase.Vector.Decoder(SolidityBase.Vector.Decoder(Array7.Decoder(Array5.Decoder(Solidity.UInt256.DECODER)))).decode(source.subData(arg1Offset))
 
             return Arguments(arg0, arg1)
@@ -89,7 +88,7 @@ public class Abi9 {
             override fun decode(source: SolidityBase.PartitionData): TupleA {
                 val arg0 = Solidity.UInt256.DECODER.decode(source)
                 val arg1 = Solidity.UInt256.DECODER.decode(source)
-                val arg2Offset = BigIntegerUtils.exact(BigInteger(source.consume(), 16))
+                val arg2Offset = BigInteger.parseString(source.consume(), 16).intValue(exactRequired = true)
                 val arg2 = SolidityBase.Vector.Decoder(SolidityBase.Vector.Decoder(Array7.Decoder(Array5.Decoder(Solidity.UInt256.DECODER)))).decode(source.subData(arg2Offset))
                 return TupleA(arg0, arg1, arg2)
             }

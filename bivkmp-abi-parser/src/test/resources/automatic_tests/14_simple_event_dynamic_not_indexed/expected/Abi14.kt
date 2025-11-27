@@ -2,8 +2,7 @@ package expected
 
 import `by`.alexandr7035.bivkmp.model.Solidity
 import `by`.alexandr7035.bivkmp.model.SolidityBase
-import `by`.alexandr7035.bivkmp.utils.BigIntegerUtils
-import java.math.BigInteger
+import com.ionspin.kotlin.bignum.integer.BigInteger
 import kotlin.Boolean
 import kotlin.String
 import kotlin.collections.List
@@ -20,9 +19,9 @@ public class Abi14 {
 
                 // Decode data
                 val source = SolidityBase.PartitionData.of(data)
-                val arg0Offset = BigIntegerUtils.exact(BigInteger(source.consume(), 16))
+                val arg0Offset = BigInteger.parseString(source.consume(), 16).intValue(exactRequired = true)
                 val arg0 = Solidity.Bytes.DECODER.decode(source.subData(arg0Offset))
-                val arg1Offset = BigIntegerUtils.exact(BigInteger(source.consume(), 16))
+                val arg1Offset = BigInteger.parseString(source.consume(), 16).intValue(exactRequired = true)
                 val arg1 = Solidity.String.DECODER.decode(source.subData(arg1Offset))
                 val arg2 = TupleA.DECODER.decode(source)
                 return Arguments(arg0, arg1, arg2)

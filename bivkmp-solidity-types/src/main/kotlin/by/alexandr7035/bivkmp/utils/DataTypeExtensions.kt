@@ -1,6 +1,5 @@
 package by.alexandr7035.bivkmp.utils
 
-import java.math.BigInteger
 import kotlin.experimental.and
 
 fun String.padStartMultiple(multiple: Int, padChar: Char = ' ') =
@@ -32,11 +31,4 @@ fun String.hexToByteArray(): ByteArray {
         i += 2
     }
     return data
-}
-
-// Compatibility method for pre Java8
-object BigIntegerUtils {
-    fun exact(bigInteger: BigInteger): Int =
-        if (bigInteger.bitLength() <= 31) bigInteger.toInt()
-        else throw ArithmeticException("BigInteger out of int range")
 }

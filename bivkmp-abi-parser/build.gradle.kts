@@ -12,6 +12,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.kotlinpoet)
+    implementation(libs.bignum)
 
     implementation(platform(libs.kotlincrypto.bom))
     implementation(libs.kotlincrypto.sha3)

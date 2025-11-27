@@ -4,11 +4,9 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import kotlinx.serialization.json.Json
 import by.alexandr7035.bivkmp.model.*
-import by.alexandr7035.bivkmp.utils.BigIntegerUtils
 import by.alexandr7035.bivkmp.utils.generateSolidityMethodId
+import com.ionspin.kotlin.bignum.integer.BigInteger
 import java.io.File
-import java.math.BigInteger
-
 
 object AbiParser {
     internal const val DECODER_FUN_ARG_NAME = "data"
@@ -278,8 +276,7 @@ object AbiParser {
         val source = if (isSolidityDynamicType(className)) {
             val dynamicValOffsetName = "$dynamicValName$DECODER_VAR_ARG_OFFSET_SUFFIX"
             function.addStatement(
-                "val·$dynamicValOffsetName·=·%T.exact(%T(%L.consume(),·16))",
-                BigIntegerUtils::class.asClassName(),
+                "val·$dynamicValOffsetName·=·%T.parseString(%L.consume(),·16).intValue(exactRequired·=·true)",
                 BigInteger::class.asClassName(),
                 DECODER_VAR_PARTITIONS_NAME
             )

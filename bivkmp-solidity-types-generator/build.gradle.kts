@@ -26,6 +26,7 @@ dependencies {
     implementation(project(":bivkmp-utils"))
     implementation(project(":bivkmp-solidity-types"))
     implementation(libs.kotlinpoet)
+    implementation(libs.bignum)
     testImplementation(libs.junit)
 }
 

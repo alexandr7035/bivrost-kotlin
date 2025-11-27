@@ -4,8 +4,8 @@ import by.alexandr7035.bivkmp.exceptions.InvalidBitLengthException
 import by.alexandr7035.bivkmp.utils.hexToByteArray
 import by.alexandr7035.bivkmp.utils.padStartMultiple
 import by.alexandr7035.bivkmp.utils.toHex
-import java.math.BigDecimal
-import java.math.BigInteger
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import com.ionspin.kotlin.bignum.integer.BigInteger
 import java.nio.charset.Charset
 import kotlin.collections.ArrayList
 
@@ -100,8 +100,8 @@ object SolidityBase {
     abstract class IntBase(private val value: BigInteger, private val bitLength: Int) : StaticType {
         init {
             if (bitLength % 8 != 0) throw InvalidBitLengthException.NOT_MULTIPLE_OF_EIGHT
-            val min = BigInteger.valueOf(2).pow(bitLength - 1).negate()
-            val max = BigInteger.valueOf(2).pow(bitLength - 1) - BigInteger.ONE
+            val min = BigInteger(2).pow(bitLength - 1).negate()
+            val max = BigInteger(2).pow(bitLength - 1) - BigInteger.ONE
 
             if (value < min || value > max) throw IllegalArgumentException("Value is not within bit range [$min, $max]")
         }
@@ -110,7 +110,7 @@ object SolidityBase {
             return if (value.signum() == -1) {
                 val bits = value.toString(2).removePrefix("-").padStart(bitLength, '0')
                 val x = bits.map { if (it == '0') '1' else '0' }.joinToString("")
-                BigInteger(x, 2).add(BigInteger.ONE).toString(16).padStartMultiple(paddingLength, 'f')
+                BigInteger.parseString(x, 2).add(BigInteger.ONE).toString(16).padStartMultiple(paddingLength, 'f')
             } else {
                 value.toString(16).padStartMultiple(paddingLength, '0')
             }
@@ -220,7 +220,7 @@ object SolidityBase {
         return (0 until capacity).map {
             if (itemDecoder.isDynamic()) {
                 // Get offset
-                val offset = BigInteger(source.consume(), 16).intValueExact()
+                val offset = BigInteger.parseString(source.consume(), 16).intValue(true)
                 // Decode dynamic data at offset
                 itemDecoder.decode(source.subData(offset))
             } else {
@@ -279,7 +279,7 @@ object SolidityBase {
             }
 
             override fun decode(source: PartitionData): Vector<T> {
-                val capacity = decodeUInt(source.consume()).toInt()
+                val capacity = decodeUInt(source.consume()).intValue()
                 return Vector(decodeList(source.subData(), capacity, itemDecoder))
             }
         }
@@ -330,11 +330,11 @@ object SolidityBase {
     }
 
     fun decodeUInt(data: String): BigInteger {
-        return BigInteger(data, 16)
+        return BigInteger.parseString(data, 16)
     }
 
     fun decodeBool(data: String): Boolean {
-        val value = BigInteger(data)
+        val value = BigInteger.parseString(data)
         return when (value) {
             BigInteger.ZERO -> false
             BigInteger.ONE -> true
@@ -343,7 +343,7 @@ object SolidityBase {
     }
 
     fun decodeInt(data: String): BigInteger {
-        val value = BigInteger(data, 16)
+        val value = BigInteger.parseString(data, 16)
         if (data.startsWith("8") ||
                 data.startsWith("9") ||
                 data.startsWith("A", true) ||
@@ -353,7 +353,7 @@ object SolidityBase {
                 data.startsWith("E", true) ||
                 data.startsWith("F", true)) {
             val x = value.toString(2).map { if (it == '0') '1' else '0' }.joinToString("")
-            return BigInteger(x, 2).add(BigInteger.ONE).multiply(BigInteger("-1"))
+            return BigInteger.parseString(x, 2).add(BigInteger.ONE).multiply(BigInteger.parseString("-1"))
         }
         return value
     }
@@ -363,7 +363,9 @@ object SolidityBase {
     }
 
     fun decodeBytes(source: PartitionData): ByteArray {
-        val contentSize = BigDecimal(BigInteger(source.consume(), 16)).intValueExact() * 2
+        val contentSize = BigDecimal.fromBigInteger(
+            BigInteger.parseString(source.consume(), 16)
+        ).intValue(exactRequired = true) * 2
         if (contentSize == 0) return kotlin.ByteArray(0)
         val sb = StringBuilder()
         while (sb.length < contentSize) {
@@ -378,7 +380,7 @@ object SolidityBase {
     @Deprecated("Deprecated for decodeList")
     fun <T : Any> decodeArray(data: String, itemDecoder: (String) -> T): List<T> {
         val params = PartitionData.of(data)
-        val contentSize = BigInteger(params.consume()).intValueExact()
+        val contentSize = BigInteger.parseString(params.consume()).intValue(true)
         if (contentSize == 0) return emptyList()
         return (0 until contentSize).map { itemDecoder(params.consume()) }
     }

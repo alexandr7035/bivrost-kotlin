@@ -6,6 +6,7 @@ plugins {
 
 dependencies {
     implementation(libs.kotlin.stdlib)
+    implementation(libs.bignum)
     testImplementation(libs.junit)
 }
 

@@ -13,6 +13,7 @@ kotlinPoet = "2.2.0"
 kotlinxSerialization = "1.8.1"
 junit = "4.13.2"
 kotlincrypto = "0.8.0"
+bignum = "0.3.8"
 
 [libraries]
 # Kotlin
@@ -31,6 +32,9 @@ kotlincrypto-sha3 = { module = "org.kotlincrypto.hash:sha3", version.ref = "kotl
 
 # Testing
 junit = { module = "junit:junit", version.ref = "junit" }
+
+# BigNum multiplatform
+bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
 
 # Android
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "androidPlugin" }

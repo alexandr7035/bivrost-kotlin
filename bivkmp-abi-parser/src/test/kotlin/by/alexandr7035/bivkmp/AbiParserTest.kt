@@ -11,7 +11,7 @@ import by.alexandr7035.bivkmp.model.AbiRoot
 import by.alexandr7035.bivkmp.model.ParameterJson
 import by.alexandr7035.bivkmp.model.Solidity
 import by.alexandr7035.bivkmp.model.SolidityBase
-import java.math.BigInteger
+import com.ionspin.kotlin.bignum.integer.BigInteger
 import kotlin.reflect.KClass
 
 
@@ -229,13 +229,13 @@ class AbiParserTest {
         // Decode uint
         assertEquals(
                 Solidity.UInt256.DECODER.decode(testData).value,
-                BigInteger("123", 16))
+                BigInteger.parseString("123", 16))
 
         // Decode uint32[]
-        val uint32Offset = BigInteger(testData.consume(), 16).intValueExact()
+        val uint32Offset = BigInteger.parseString(testData.consume(), 16).intValue(exactRequired = true)
         assertEquals(
             SolidityBase.Vector.Decoder(Solidity.UInt32.DECODER).decode(testData.subData(uint32Offset)).items,
-            listOf(Solidity.UInt32(BigInteger("456", 16)), Solidity.UInt32(BigInteger("789", 16))))
+            listOf(Solidity.UInt32(BigInteger.parseString("456", 16)), Solidity.UInt32(BigInteger.parseString("789", 16))))
 
         // Decode bytes10
         Assert.assertArrayEquals(
@@ -243,7 +243,7 @@ class AbiParserTest {
                 "1234567890".toByteArray())
 
         // Consume location of bytes (we don't need it)
-        val bytesOffset = BigInteger(testData.consume(), 16).intValueExact()
+        val bytesOffset = BigInteger.parseString(testData.consume(), 16).intValue(exactRequired = true)
         Assert.assertArrayEquals(
             Solidity.Bytes.DECODER.decode(testData.subData(bytesOffset)).items,
             "Hello, world!".toByteArray())
@@ -257,9 +257,9 @@ class AbiParserTest {
         (0x123, [0x456, 0x789], "1234567890", "Hello, world!")
          */
 
-        val arg1 = Solidity.UInt256(BigInteger("123", 16))
+        val arg1 = Solidity.UInt256(BigInteger.parseString("123", 16))
         val arg2 = SolidityBase.Vector(
-                listOf(Solidity.UInt32(BigInteger("456", 16)), Solidity.UInt32(BigInteger("789", 16)))
+                listOf(Solidity.UInt32(BigInteger.parseString("456", 16)), Solidity.UInt32(BigInteger.parseString("789", 16)))
         )
         val arg3 = Solidity.Bytes10("1234567890".toByteArray())
         val arg4 = Solidity.String("Hello, world!")
@@ -287,11 +287,11 @@ class AbiParserTest {
          */
 
         val arg1 = TestArray(
-                listOf(Solidity.UInt32(BigInteger("456", 16)), Solidity.UInt32(BigInteger("789", 16))), 2
+                listOf(Solidity.UInt32(BigInteger.parseString("456", 16)), Solidity.UInt32(BigInteger.parseString("789", 16))), 2
         )
         val arg2 = Solidity.String("Hello, world!")
         val arg3 = SolidityBase.Vector(
-                listOf(Solidity.UInt32(BigInteger("123", 16)))
+                listOf(Solidity.UInt32(BigInteger.parseString("123", 16)))
         )
         val data = SolidityBase.encodeFunctionArguments(arg1, arg2, arg3)
 

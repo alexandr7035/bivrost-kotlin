@@ -2,11 +2,22 @@
 
 package by.alexandr7035.bivkmp
 
-import com.squareup.kotlinpoet.*
 import by.alexandr7035.bivkmp.model.SolidityBase
-import java.io.File
-import java.math.BigInteger
+import com.ionspin.kotlin.bignum.integer.BigInteger
+import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.CodeBlock
+import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.asClassName
+import java.io.File
+
+// Explicit ClassName for BigInteger to avoid ambiguity with java.math.BigInteger
+private val BigIntegerClassName = BigInteger::class.asClassName()
 
 fun main(vararg args: String) {
     args.forEach { println(it.split(File.separator).last()) }
@@ -19,7 +30,7 @@ fun generate(path: String, packageName: String) {
     val fileName = "Solidity"
     val indentation = "    "
 
-    val modelPackageName = "$packageName.model"
+    val modelPackageName = "$packageName.bivkmp.model"
     val kotlinFile = FileSpec.builder(modelPackageName, fileName)
     val solidityGeneratedObject = TypeSpec.objectBuilder(fileName)
 
@@ -87,8 +98,8 @@ private fun generateUInt(className: String, nBits: Int): TypeSpec {
                     decoderTypeName,
                     CodeBlock.of("%1T({ %2L(it) })", decoderTypeName, className)))
             .primaryConstructor(FunSpec.constructorBuilder().addParameter(
-                    ParameterSpec.builder("value", BigInteger::class).build()).build())
-            .addProperty(PropertySpec.builder("value", BigInteger::class)
+                    ParameterSpec.builder("value", BigIntegerClassName).build()).build())
+            .addProperty(PropertySpec.builder("value", BigIntegerClassName)
                     .initializer("value")
                     .build())
             .build()
@@ -105,8 +116,8 @@ private fun generateAddress(): TypeSpec {
                     decoderTypeName,
                     CodeBlock.of("%1T({ %2L(it) })", decoderTypeName, name)))
             .primaryConstructor(FunSpec.constructorBuilder().addParameter(
-                    ParameterSpec.builder("value", BigInteger::class).build()).build())
-            .addProperty(PropertySpec.builder("value", BigInteger::class)
+                    ParameterSpec.builder("value", BigIntegerClassName).build()).build())
+            .addProperty(PropertySpec.builder("value", BigIntegerClassName)
                     .initializer("value")
                     .build())
             .build()
@@ -118,7 +129,7 @@ private fun generateBool(): TypeSpec {
     return TypeSpec.classBuilder(name)
             .addModifiers(KModifier.DATA)
             .superclass(SolidityBase.UIntBase::class)
-            .addSuperclassConstructorParameter("if (%1L) %2T.ONE else %2T.ZERO, %3L", "value", BigInteger::class, "8")
+            .addSuperclassConstructorParameter("if (%1L) %2T.ONE else %2T.ZERO, %3L", "value", BigIntegerClassName, "8")
             .primaryConstructor(FunSpec.constructorBuilder().addParameter(
                     ParameterSpec.builder("value", Boolean::class).build()).build())
             .addProperty(PropertySpec.builder("value", Boolean::class)
@@ -148,8 +159,8 @@ private fun generateInt(className: String, nBits: Int): TypeSpec {
                     decoderTypeName,
                     CodeBlock.of("%1T({ %2L(it) })", decoderTypeName, className)))
             .primaryConstructor(FunSpec.constructorBuilder().addParameter(
-                    ParameterSpec.builder("value", BigInteger::class).build()).build())
-            .addProperty(PropertySpec.builder("value", BigInteger::class)
+                    ParameterSpec.builder("value", BigIntegerClassName).build()).build())
+            .addProperty(PropertySpec.builder("value", BigIntegerClassName)
                     .initializer("value")
                     .build())
             .build()
@@ -183,7 +194,7 @@ private fun generateDynamicBytes(): TypeSpec {
                     .build())
             .addProperty(PropertySpec.builder("items", ByteArray::class).initializer("items").build())
             .addInitializerBlock(CodeBlock.builder()
-                    .addStatement("if (%1T(items.size.toString(10)) > %1T.valueOf(2).pow(256)) throw %2T()", BigInteger::class, Exception::class)
+                    .addStatement("if (%1T.parseString(items.size.toString(10), 10) > %1T.TWO.pow(256)) throw %2T()", BigIntegerClassName, Exception::class)
                     .build())
             .addFunction(FunSpec.builder("encode")
                     .addModifiers(KModifier.OVERRIDE)
