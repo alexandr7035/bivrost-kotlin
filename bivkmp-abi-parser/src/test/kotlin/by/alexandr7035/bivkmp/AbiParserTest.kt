@@ -4,9 +4,12 @@ package by.alexandr7035.bivkmp
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
-import org.junit.Assert
-import org.junit.Assert.*
-import org.junit.Test
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import kotlin.test.assertFalse
+import kotlin.test.assertFailsWith
+import kotlin.test.assertContentEquals
 import by.alexandr7035.bivkmp.model.AbiRoot
 import by.alexandr7035.bivkmp.model.ParameterJson
 import by.alexandr7035.bivkmp.model.Solidity
@@ -23,61 +26,73 @@ class AbiParserTest {
             = ParameterJson(name, type, components)
 
     private fun assertType(instance: Any, type: KClass<*>) {
-        assertTrue("$instance should be a $type", type.isInstance(instance))
+        assertTrue(type.isInstance(instance), "$instance should be a $type")
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun testInvalidArrayDefOpeningBracketStart() {
-        mapType(testParameter("uint[[5][]"), testContext())
+        assertFailsWith<IllegalArgumentException> {
+            mapType(testParameter("uint[[5][]"), testContext())
+        }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun testInvalidArrayDefOpeningBracketMiddle() {
-        mapType(testParameter("uint[5][[]"), testContext())
+        assertFailsWith<IllegalArgumentException> {
+            mapType(testParameter("uint[5][[]"), testContext())
+        }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun testInvalidArrayDefOpeningBracketEnd() {
-        mapType(testParameter("uint[5][]["), testContext())
+        assertFailsWith<IllegalArgumentException> {
+            mapType(testParameter("uint[5][]["), testContext())
+        }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun testInvalidArrayDefLetterAsSize() {
-        mapType(testParameter("uint[a][]"), testContext())
+        assertFailsWith<IllegalArgumentException> {
+            mapType(testParameter("uint[a][]"), testContext())
+        }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun testInvalidArrayDefClosingBracket() {
-        mapType(testParameter("uint[5][]]"), testContext())
+        assertFailsWith<IllegalArgumentException> {
+            mapType(testParameter("uint[5][]]"), testContext())
+        }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun testInvalidArrayDefUnknownType() {
-        mapType(testParameter("gnosis[1][]"), testContext())
+        assertFailsWith<IllegalArgumentException> {
+            mapType(testParameter("gnosis[1][]"), testContext())
+        }
     }
 
-    @Test()
+    @Test
     fun testSimpleTypeHolder() {
-        assertEquals("Unknown type should return null", SimpleTypeHolder.forType("unknown"), null)
-        assertEquals("Tuple type should return null", SimpleTypeHolder.forType("tuple"), null)
+        assertEquals(null, SimpleTypeHolder.forType("unknown"), "Unknown type should return null")
+        assertEquals(null, SimpleTypeHolder.forType("tuple"), "Tuple type should return null")
 
         val bytes32 = SimpleTypeHolder.forType("bytes32")!!
-        assertFalse("bytes32 should be static", bytes32.isDynamic())
+        assertFalse(bytes32.isDynamic(), "bytes32 should be static")
 
         val uint = SimpleTypeHolder.forType("uint")!!
-        assertFalse("uint should be static", uint.isDynamic())
+        assertFalse(uint.isDynamic(), "uint should be static")
 
         val int = SimpleTypeHolder.forType("int")!!
-        assertFalse("int should be static", int.isDynamic())
+        assertFalse(int.isDynamic(), "int should be static")
 
         val bytes = SimpleTypeHolder.forType("bytes")!!
-        assertTrue("bytes should be dynamic", bytes.isDynamic())
+        assertTrue(bytes.isDynamic(), "bytes should be dynamic")
 
         val string = SimpleTypeHolder.forType("string")!!
-        assertTrue("string should be dynamic", string.isDynamic())
+        assertTrue(string.isDynamic(), "string should be dynamic")
     }
 
-    @Test()
+    @Test
     fun testParseAliasTypes() {
         val uintType = mapType(testParameter("uint"), testContext())
         assertType(uintType, SimpleTypeHolder::class)
@@ -92,7 +107,7 @@ class AbiParserTest {
         assertEquals(Solidity.Bytes1::class.asClassName(), byteType.toTypeName())
     }
 
-    @Test()
+    @Test
     fun testParseDynamicTupleType() {
         val components = listOf(testParameter("uint", "a"), testParameter("uint[]", "b"))
         val tupleType = mapType(testParameter("tuple", components = components), testContext())
@@ -114,7 +129,7 @@ class AbiParserTest {
         assertEquals(ClassName("", "TupleA"), tupleType.toTypeName())
     }
 
-    @Test()
+    @Test
     fun testStaticDynamicTupleType() {
         val components = listOf(testParameter("uint", "a"), testParameter("uint[5]", "b"))
         val tupleType = mapType(testParameter("tuple", components = components), testContext())
@@ -137,7 +152,7 @@ class AbiParserTest {
         assertEquals(ClassName("", "TupleA"), tupleType.toTypeName())
     }
 
-    @Test()
+    @Test
     fun testParseUIntNestedArray() {
         val type = mapType(testParameter("uint[5][]"), testContext())
         assertType(type, VectorTypeHolder::class)
@@ -155,7 +170,7 @@ class AbiParserTest {
         assertEquals(Solidity.UInt256::class.asTypeName(), g2Type.toTypeName())
     }
 
-    @Test()
+    @Test
     fun testParseStringDynamicArray() {
         val type = mapType(testParameter("string[]"), testContext())
         assertType(type, VectorTypeHolder::class)
@@ -167,7 +182,7 @@ class AbiParserTest {
         assertEquals(Solidity.String::class.asTypeName(), g1Type.toTypeName())
     }
 
-    @Test()
+    @Test
     fun testParseStringStaticArray() {
         val type = mapType(testParameter("string[5]"), testContext())
         assertType(type, ArrayTypeHolder::class)
@@ -180,7 +195,7 @@ class AbiParserTest {
         assertEquals(Solidity.String::class.asTypeName(), g1Type.toTypeName())
     }
 
-    @Test()
+    @Test
     fun testParseBytesArray() {
         val type = mapType(testParameter("bytes[5]"), testContext())
         assertType(type, ArrayTypeHolder::class)
@@ -195,7 +210,7 @@ class AbiParserTest {
         assertTrue(g1Type.isDynamic())
     }
 
-    @Test()
+    @Test
     fun testParseBytesXArray() {
         val type = mapType(testParameter("bytes32[5]"), testContext())
         assertType(type, ArrayTypeHolder::class)
@@ -228,25 +243,25 @@ class AbiParserTest {
                 "48656c6c6f2c20776f726c642100000000000000000000000000000000000000")
         // Decode uint
         assertEquals(
-                Solidity.UInt256.DECODER.decode(testData).value,
-                BigInteger.parseString("123", 16))
+                BigInteger.parseString("123", 16),
+                Solidity.UInt256.DECODER.decode(testData).value)
 
         // Decode uint32[]
         val uint32Offset = BigInteger.parseString(testData.consume(), 16).intValue(exactRequired = true)
         assertEquals(
-            SolidityBase.Vector.Decoder(Solidity.UInt32.DECODER).decode(testData.subData(uint32Offset)).items,
-            listOf(Solidity.UInt32(BigInteger.parseString("456", 16)), Solidity.UInt32(BigInteger.parseString("789", 16))))
+            listOf(Solidity.UInt32(BigInteger.parseString("456", 16)), Solidity.UInt32(BigInteger.parseString("789", 16))),
+            SolidityBase.Vector.Decoder(Solidity.UInt32.DECODER).decode(testData.subData(uint32Offset)).items)
 
         // Decode bytes10
-        Assert.assertArrayEquals(
-                Solidity.Bytes10.DECODER.decode(testData).bytes,
-                "1234567890".toByteArray())
+        assertContentEquals(
+                "1234567890".toByteArray(),
+                Solidity.Bytes10.DECODER.decode(testData).bytes)
 
         // Consume location of bytes (we don't need it)
         val bytesOffset = BigInteger.parseString(testData.consume(), 16).intValue(exactRequired = true)
-        Assert.assertArrayEquals(
-            Solidity.Bytes.DECODER.decode(testData.subData(bytesOffset)).items,
-            "Hello, world!".toByteArray())
+        assertContentEquals(
+            "Hello, world!".toByteArray(),
+            Solidity.Bytes.DECODER.decode(testData.subData(bytesOffset)).items)
     }
 
     @Test
@@ -275,7 +290,7 @@ class AbiParserTest {
                 "0000000000000000000000000000000000000000000000000000000000000789" +
                 "000000000000000000000000000000000000000000000000000000000000000d" +
                 "48656c6c6f2c20776f726c642100000000000000000000000000000000000000"
-        assertEquals(data, expected)
+        assertEquals(expected, data)
     }
 
     @Test
@@ -311,7 +326,7 @@ class AbiParserTest {
                 // uint32[] -> [0x123]
                 "0000000000000000000000000000000000000000000000000000000000000001" +
                 "0000000000000000000000000000000000000000000000000000000000000123"
-        assertEquals(data, expected)
+        assertEquals(expected, data)
     }
 
     private class TestArray<out T : SolidityBase.Type>(items: List<T>, capacity: Int) : SolidityBase.Array<T>(items, capacity)

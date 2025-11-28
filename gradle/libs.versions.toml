@@ -11,7 +11,6 @@ buildTools = "28.0.3"
 # Libraries
 kotlinPoet = "2.2.0"
 kotlinxSerialization = "1.8.1"
-junit = "4.13.2"
 kotlincrypto = "0.8.0"
 bignum = "0.3.8"
 
@@ -31,7 +30,7 @@ kotlincrypto-bom = { module = "org.kotlincrypto.hash:bom", version.ref = "kotlin
 kotlincrypto-sha3 = { module = "org.kotlincrypto.hash:sha3", version.ref = "kotlincrypto" }
 
 # Testing
-junit = { module = "junit:junit", version.ref = "junit" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 
 # BigNum multiplatform
 bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }

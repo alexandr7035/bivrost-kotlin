@@ -27,7 +27,7 @@ dependencies {
     implementation(project(":bivkmp-solidity-types"))
     implementation(libs.kotlinpoet)
     implementation(libs.bignum)
-    testImplementation(libs.junit)
+    testImplementation(libs.kotlin.test)
 }
 
 tasks.register<Jar>("sourcesJar") {

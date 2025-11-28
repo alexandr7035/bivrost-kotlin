@@ -12,7 +12,7 @@ dependencies {
     implementation(platform(libs.kotlincrypto.bom))
     implementation(libs.kotlincrypto.sha3)
     
-    testImplementation(libs.junit)
+    testImplementation(libs.kotlin.test)
 }
 
 tasks.register<Jar>("sourcesJar") {
