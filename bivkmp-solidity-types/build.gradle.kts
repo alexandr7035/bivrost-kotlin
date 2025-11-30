@@ -1,32 +1,40 @@
 plugins {
-    java
     `maven-publish`
-    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlinMultiplatform)
 }
 
-dependencies {
-    implementation(libs.kotlin.stdlib)
-    implementation(libs.bignum)
-    testImplementation(libs.kotlin.test)
-}
+kotlin {
+    jvm()
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+    linuxX64()
 
-tasks.register<Jar>("sourcesJar") {
-    archiveClassifier.set("sources")
-    from(sourceSets.main.get().allSource)
+    sourceSets {
+        commonMain.dependencies {
+            implementation(libs.bignum)
+        }
+
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+        }
+    }
 }
 
 publishing {
     publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
-            artifact(tasks["sourcesJar"])
+        withType<MavenPublication> {
+            pom {
+                name.set("bivkmp-solidity-types")
+                description.set("Solidity types for Kotlin")
+            }
         }
     }
     repositories {
         mavenLocal()
         maven {
+            name = "repo"
             url = uri("../repo")
         }
     }
 }
-

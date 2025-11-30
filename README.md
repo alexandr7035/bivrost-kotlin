@@ -1,4 +1,4 @@
-~### BivKMP-Solidity
+### BivKMP-Solidity
 
 A refreshed fork of [Gnosis's Bivrost](https://github.com/5afe/bivrost-kotlin) - Bridge between Solidity Contracts and Kotlin
 
@@ -15,11 +15,11 @@ A refreshed fork of [Gnosis's Bivrost](https://github.com/5afe/bivrost-kotlin) -
 #### TODO Setup of Sample App
 * Optional: Generate the Solidity types:
   - `./gradlew :bivkmp-solidity-types-generator:runSolidityTypeGenerator`
-* Add library artifacts to local maven:
-  - `./gradlew :bivkmp-utils:uploadArchives`
-  - `./gradlew :bivkmp-solidity-types:uploadArchives`
-  - `./gradlew :bivkmp-abi-parser:uploadArchives`
-  - `./gradlew :bivkmp-gradle-plugin:uploadArchives`
+* Publish library artifacts to local maven:
+  - `./gradlew :bivkmp-solidity-types:publishToMavenLocal`
+  - `./gradlew :bivkmp-utils:publishToMavenLocal`
+  - `./gradlew :bivkmp-abi-parser:publishToMavenLocal`
+  - `./gradlew :bivkmp-gradle-plugin:publishToMavenLocal`
   
 * Uncomment `include ':sample:app'` in the `settings.gradle` to include sample app module.
 

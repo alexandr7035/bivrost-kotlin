@@ -1,6 +1,6 @@
-// Kotlin native lib TODO
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlinMultiplatform) apply  false
 }
 
 fun getKey(name: String, defaultValue: String? = null): String {

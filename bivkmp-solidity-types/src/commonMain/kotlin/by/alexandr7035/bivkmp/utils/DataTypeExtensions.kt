@@ -18,7 +18,7 @@ fun ByteArray.toHex(): String {
         hexChars[j * 2] = hexArray[v ushr 4]
         hexChars[j * 2 + 1] = hexArray[v and 0x0F]
     }
-    return String(hexChars)
+    return hexChars.concatToString()
 }
 
 fun String.hexToByteArray(): ByteArray {
@@ -27,7 +27,9 @@ fun String.hexToByteArray(): ByteArray {
     val data = ByteArray(len / 2)
     var i = 0
     while (i < len) {
-        data[i / 2] = ((Character.digit(s[i], 16) shl 4) + Character.digit(s[i + 1], 16)).toByte()
+        val high = s[i].digitToInt(16)
+        val low = s[i + 1].digitToInt(16)
+        data[i / 2] = ((high shl 4) + low).toByte()
         i += 2
     }
     return data

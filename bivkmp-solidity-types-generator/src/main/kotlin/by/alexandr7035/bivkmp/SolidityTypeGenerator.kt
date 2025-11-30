@@ -21,12 +21,12 @@ private val BigIntegerClassName = BigInteger::class.asClassName()
 
 fun main(vararg args: String) {
     args.forEach { println(it.split(File.separator).last()) }
-    if (args.isNotEmpty()) {
-        generate(args[0], args[1])
+    if (args.size >= 3) {
+        generate(args[0], args[1], args[2])
     }
 }
 
-fun generate(path: String, packageName: String) {
+fun generate(commonMainPath: String, commonTestPath: String, packageName: String) {
     val fileName = "Solidity"
     val indentation = "    "
 
@@ -82,8 +82,11 @@ fun generate(path: String, packageName: String) {
     // Add map to object
     solidityGeneratedObject.addProperty(PropertySpec.builder("types", mapType).initializer(typeMapBlock.build()).build())
 
-    // Write object file
-    kotlinFile.indent(indentation).addType(solidityGeneratedObject.build()).build().writeTo(File(path.removeSuffix(modelPackageName)))
+    // Write object file to commonMain - KotlinPoet will create directory structure based on package
+    kotlinFile.indent(indentation).addType(solidityGeneratedObject.build()).build().writeTo(File(commonMainPath))
+    
+    // Generate type registry to commonTest
+    generateTypeRegistry(commonTestPath, modelPackageName, uInts, ints, staticBytes, fileName, indentation)
 }
 
 private fun generateUInts(): List<TypeSpec> = (8..256 step 8).map { generateUInt("UInt$it", it) }.toList()
@@ -194,7 +197,7 @@ private fun generateDynamicBytes(): TypeSpec {
                     .build())
             .addProperty(PropertySpec.builder("items", ByteArray::class).initializer("items").build())
             .addInitializerBlock(CodeBlock.builder()
-                    .addStatement("if (%1T.parseString(items.size.toString(10), 10) > %1T.TWO.pow(256)) throw %2T()", BigIntegerClassName, Exception::class)
+                    .addStatement("if (%1T.parseString(items.size.toString(10), 10) > %1T.TWO.pow(256)) throw %2T()", BigIntegerClassName, ClassName("kotlin", "Exception"))
                     .build())
             .addFunction(FunSpec.builder("encode")
                     .addModifiers(KModifier.OVERRIDE)
@@ -237,7 +240,7 @@ private fun generateString(): TypeSpec {
     return TypeSpec.classBuilder(name)
             .addModifiers(KModifier.DATA)
             .superclass(superClass)
-            .addSuperclassConstructorParameter("%1L.toByteArray()", "value")
+            .addSuperclassConstructorParameter("%1L.encodeToByteArray()", "value")
             .primaryConstructor(FunSpec.constructorBuilder().addParameter(
                     ParameterSpec.builder("value", String::class).build()).build())
             .addProperty(PropertySpec.builder("value", String::class)
@@ -252,4 +255,97 @@ private fun generateString(): TypeSpec {
                     decoderTypeName,
                     CodeBlock.of("%1T()", decoderTypeName)))
             .build()
+}
+
+private fun generateTypeRegistry(commonTestPath: String, modelPackageName: String, uInts: List<TypeSpec>, ints: List<TypeSpec>, staticBytes: List<TypeSpec>, solidityObjectName: String, indentation: String) {
+    val registryFileName = "SolidityTypeRegistry"
+    val registryFile = FileSpec.builder(modelPackageName, registryFileName)
+    val registryObject = TypeSpec.objectBuilder(registryFileName)
+        .addModifiers(KModifier.INTERNAL)
+    
+    // Add imports - only external dependencies, not same-package classes (Solidity and SolidityBase are in the same package)
+    registryFile.addImport("com.ionspin.kotlin.bignum.integer", "BigInteger")
+    
+    registryObject.addKdoc("Generated code. Do not modify\n")
+    registryObject.addKdoc("Internal registry for creating Solidity type instances without reflection.\n")
+    
+    val stringClassName = ClassName("kotlin", "String")
+    val mapClassName = ClassName("kotlin.collections", "Map")
+    val uintBaseClassName = SolidityBase.UIntBase::class.asClassName()
+    val intBaseClassName = SolidityBase.IntBase::class.asClassName()
+    val staticBytesClassName = SolidityBase.StaticBytes::class.asClassName()
+    val bigIntegerClassName = BigIntegerClassName
+    val byteArrayClassName = ClassName("kotlin", "ByteArray")
+    
+    // Define functional types for factories
+    val uintFactoryType = ClassName("kotlin", "Function1").parameterizedBy(bigIntegerClassName, uintBaseClassName)
+    val intFactoryType = ClassName("kotlin", "Function1").parameterizedBy(bigIntegerClassName, intBaseClassName)
+    val bytesFactoryType = ClassName("kotlin", "Function1").parameterizedBy(byteArrayClassName, staticBytesClassName)
+    
+    // Generate UInt factories map
+    val solidityClassName = ClassName(modelPackageName, solidityObjectName)
+    val uintFactoriesType = mapClassName.parameterizedBy(stringClassName, uintFactoryType)
+    val uintFactoryMapBuilder = CodeBlock.builder()
+    uintFactoryMapBuilder.add("mapOf(\n")
+    uInts.forEachIndexed { index, typeSpec ->
+        val typeName = typeSpec.name!!
+        val mapKey = typeName.lowercase()
+        val comma = if (index < uInts.size - 1) "," else ""
+        uintFactoryMapBuilder.add("$indentation$indentation\"$mapKey\" to { value: %T -> %T.$typeName(value) }$comma\n",
+            bigIntegerClassName,
+            solidityClassName
+        )
+    }
+    uintFactoryMapBuilder.add("$indentation)")
+    
+    registryObject.addProperty(PropertySpec.builder("uintFactories", uintFactoriesType)
+        .addModifiers(KModifier.INTERNAL)
+        .initializer(uintFactoryMapBuilder.build())
+        .build())
+    
+    // Generate Int factories map
+    val intFactoriesType = mapClassName.parameterizedBy(stringClassName, intFactoryType)
+    val intFactoryMapBuilder = CodeBlock.builder()
+    intFactoryMapBuilder.add("mapOf(\n")
+    ints.forEachIndexed { index, typeSpec ->
+        val typeName = typeSpec.name!!
+        val mapKey = typeName.lowercase()
+        val comma = if (index < ints.size - 1) "," else ""
+        intFactoryMapBuilder.add("$indentation$indentation\"$mapKey\" to { value: %T -> %T.$typeName(value) }$comma\n",
+            bigIntegerClassName,
+            solidityClassName
+        )
+    }
+    intFactoryMapBuilder.add("$indentation)")
+    
+    registryObject.addProperty(PropertySpec.builder("intFactories", intFactoriesType)
+        .addModifiers(KModifier.INTERNAL)
+        .initializer(intFactoryMapBuilder.build())
+        .build())
+    
+    // Generate Bytes factories map
+    val bytesFactoriesType = mapClassName.parameterizedBy(stringClassName, bytesFactoryType)
+    val bytesFactoryMapBuilder = CodeBlock.builder()
+    bytesFactoryMapBuilder.add("mapOf(\n")
+    staticBytes.forEachIndexed { index, typeSpec ->
+        val typeName = typeSpec.name!!
+        val mapKey = typeName.lowercase()
+        val comma = if (index < staticBytes.size - 1) "," else ""
+        bytesFactoryMapBuilder.add("$indentation$indentation\"$mapKey\" to { bytes: %T -> %T.$typeName(bytes) }$comma\n",
+            byteArrayClassName,
+            solidityClassName
+        )
+    }
+    bytesFactoryMapBuilder.add("$indentation)")
+    
+    registryObject.addProperty(PropertySpec.builder("bytesFactories", bytesFactoriesType)
+        .addModifiers(KModifier.INTERNAL)
+        .initializer(bytesFactoryMapBuilder.build())
+        .build())
+    
+    // Write registry file to commonTest - KotlinPoet will create directory structure based on package
+    registryFile.indent(indentation)
+        .addType(registryObject.build())
+        .build()
+        .writeTo(File(commonTestPath))
 }

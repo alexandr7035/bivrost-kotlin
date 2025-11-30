@@ -6,7 +6,6 @@ import by.alexandr7035.bivkmp.utils.padStartMultiple
 import by.alexandr7035.bivkmp.utils.toHex
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.integer.BigInteger
-import kotlin.text.Charsets
 import kotlin.collections.ArrayList
 
 object SolidityBase {
@@ -35,7 +34,7 @@ object SolidityBase {
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
-            if (javaClass != other?.javaClass) return false
+            if (!this.isSameTypeAs(other)) return false
 
             other as Collection<*>
 
@@ -72,7 +71,7 @@ object SolidityBase {
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
-            if (javaClass != other?.javaClass) return false
+            if (!this.isSameTypeAs(other)) return false
 
             other as UIntBase
 
@@ -123,7 +122,7 @@ object SolidityBase {
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
-            if (javaClass != other?.javaClass) return false
+            if (!this.isSameTypeAs(other)) return false
 
             other as IntBase
 
@@ -162,7 +161,7 @@ object SolidityBase {
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
-            if (javaClass != other?.javaClass) return false
+            if (!this.isSameTypeAs(other)) return false
 
             other as StaticBytes
 
@@ -374,8 +373,8 @@ object SolidityBase {
         return sb.substring(0, contentSize).hexToByteArray()
     }
 
-    fun decodeString(source: PartitionData) =
-            decodeBytes(source).toString(Charsets.UTF_8)
+    fun decodeString(source: PartitionData): String =
+        decodeBytes(source).decodeToString()
 
     @Deprecated("Deprecated for decodeList")
     fun <T : Any> decodeArray(data: String, itemDecoder: (String) -> T): List<T> {
@@ -384,4 +383,8 @@ object SolidityBase {
         if (contentSize == 0) return emptyList()
         return (0 until contentSize).map { itemDecoder(params.consume()) }
     }
+
+    private fun Any?.isSameTypeAs(other: Any?): Boolean =
+        if (this == null || other == null) false
+        else this::class == other::class
 }

@@ -7,13 +7,15 @@ It automatically creates Kotlin classes with encode/decode methods for contract 
 
 ### Main Modules
 
-- **bivkmp-solidity-types**: Runtime types for Solidity data types (UInt, Int, Bytes, Address, etc.)
+- **bivkmp-solidity-types**: Runtime types for Solidity data types (UInt, Int, Bytes, Address, etc.) - **Kotlin Multiplatform (KMP)**
 - **bivkmp-utils**: Utility functions (hex conversion, Keccak256 hashing)
 - **bivkmp-abi-parser**: Core ABI parsing and Kotlin code generation (uses KotlinPoet)
 - **bivkmp-gradle-plugin**: Android Gradle Plugin integration for automatic code generation
 - **bivkmp-solidity-types-generator**: Standalone generator for Solidity type classes
 
 ## Testing
+
+**Note**: All tests have been migrated from JUnit to Kotlin Test framework for multiplatform compatibility.
 
 Run all tests:
 ```bash
@@ -27,6 +29,12 @@ Run tests for specific module:
 ```
 
 Test output shows status for each test (PASSED/FAILED/SKIPPED) configured in `build.gradle` test blocks.
+
+### Test Infrastructure
+
+- **Kotlin Test**: All tests use `kotlin.test` framework (multiplatform-compatible)
+- **No Reflection**: Tests use automatically generated `SolidityTypeRegistry` instead of Java reflection for type instantiation
+- **Registry Location**: `SolidityTypeRegistry.kt` is generated in `commonTest` source set (internal, test-only)
 
 ## Publishing Locally
 
@@ -45,8 +53,47 @@ Publish single module:
 
 Artifacts are published to `~/.m2/repository/by/alexandr7035/` directory.
 
+### Kotlin Multiplatform Publishing
+
+The `bivkmp-solidity-types` module is published as a multiplatform library:
+- **Main artifact**: `bivkmp-solidity-types` (contains common code and metadata)
+- **Platform-specific artifacts**: 
+  - `bivkmp-solidity-types-jvm` (JVM bytecode)
+  - `bivkmp-solidity-types-linuxx64` (Native Linux klib)
+  - iOS artifacts (iosX64, iosArm64, iosSimulatorArm64) - published when iOS toolchain is available
+
+Gradle automatically selects the correct artifact variant based on the target platform.
+
 ## Key Files
 
 - `build.gradle`: Root project config with version definitions
 - `bivkmp-abi-parser/src/test/resources/automatic_tests/`: test contract scenarios
 - `bivkmp-gradle-plugin/src/main/kotlin/by/alexandr7035/bivkmp/plugin/BivkmpPlugin.kt`: Gradle plugin entry point
+
+## Architecture Notes
+
+### Kotlin Multiplatform Support
+
+- **bivkmp-solidity-types** is a Kotlin Multiplatform module supporting:
+  - JVM
+  - iOS (x64, arm64, simulatorArm64)
+  - Linux (x64)
+  
+- **Code Generation**: 
+  - `Solidity.kt` is generated in `commonMain` (production code)
+  - `SolidityTypeRegistry.kt` is generated in `commonTest` (test-only, internal)
+  - Generator automatically creates KMP-compatible code
+
+### Reflection-Free Testing
+**Current Solution:**
+- Tests use automatically generated `SolidityTypeRegistry` with functional factory types instead of Java reflection usage in original lib
+```kotlin
+  (8..256 step 8).forEach {
+      val factory = SolidityTypeRegistry.uintFactories["uint$it"]!!
+      factory(value) // Test all UInt types in a single loop
+  }
+  ```
+- Registry contains factories for all UInt, Int, and Bytes types (generated automatically)
+- Enables multiplatform testing without JVM-specific reflection APIs
+- Maintains the same compact test structure while being KMP-compatible
+- Registry is internal and hidden from library consumers

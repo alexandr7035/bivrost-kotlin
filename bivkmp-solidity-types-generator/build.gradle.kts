@@ -6,25 +6,34 @@ plugins {
 
 tasks.register<JavaExec>("runSolidityTypeGenerator") {
     val targetProject = project.parent?.childProjects?.get("bivkmp-solidity-types") ?: project
-    val srcDirs = targetProject.extensions.getByType<SourceSetContainer>()
-        .getByName("main")
-        .kotlin
-        .srcDirs
-    if (srcDirs.isEmpty()) {
-        logger.error("Couldn't find kotlin main source sets")
+    val kotlinExtension = targetProject.extensions.getByType<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension>()
+    
+    val commonMainSourceSet = kotlinExtension.sourceSets.getByName("commonMain")
+    val commonMainSrcDirs = commonMainSourceSet.kotlin.srcDirs
+    if (commonMainSrcDirs.isEmpty()) {
+        logger.error("Couldn't find kotlin commonMain source sets")
+        return@register
+    }
+    
+    val commonTestSourceSet = kotlinExtension.sourceSets.getByName("commonTest")
+    val commonTestSrcDirs = commonTestSourceSet.kotlin.srcDirs
+    if (commonTestSrcDirs.isEmpty()) {
+        logger.error("Couldn't find kotlin commonTest source sets")
         return@register
     }
 
-    val path = srcDirs.first().absolutePath
+    val commonMainPath = commonMainSrcDirs.first().absolutePath
+    val commonTestPath = commonTestSrcDirs.first().absolutePath
     mainClass.set("by.alexandr7035.bivkmp.SolidityTypeGenerator")
     classpath = sourceSets.main.get().runtimeClasspath
-    args(path, project.group)
+    args(commonMainPath, commonTestPath, project.group)
 }
 
 dependencies {
-    implementation(libs.kotlin.stdlib)
     implementation(project(":bivkmp-utils"))
     implementation(project(":bivkmp-solidity-types"))
+
+    implementation(libs.kotlin.stdlib)
     implementation(libs.kotlinpoet)
     implementation(libs.bignum)
     testImplementation(libs.kotlin.test)
@@ -49,4 +58,3 @@ publishing {
         }
     }
 }
-

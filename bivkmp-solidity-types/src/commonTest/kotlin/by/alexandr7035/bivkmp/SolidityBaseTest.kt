@@ -4,12 +4,11 @@ import by.alexandr7035.bivkmp.exceptions.InvalidBitLengthException
 import by.alexandr7035.bivkmp.model.Solidity
 import by.alexandr7035.bivkmp.model.SolidityBase
 import com.ionspin.kotlin.bignum.integer.BigInteger
-import java.lang.reflect.InvocationTargetException
+import by.alexandr7035.bivkmp.model.SolidityTypeRegistry
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.fail
 
 class SolidityBaseTest {
     @Test
@@ -77,13 +76,10 @@ class SolidityBaseTest {
     fun testUIntBitOverflow() {
         (8..256 step 8).forEach {
             val upperLimit = BigInteger(2).pow(it)
-            val constructor = Class.forName(formatClassName(Solidity.types["uint$it"]!!)).constructors[0]
-            constructor.newInstance(upperLimit.minus(BigInteger.ONE))
-            try {
-                constructor.newInstance(upperLimit)
-                fail("Expected InvalidBitLengthException")
-            } catch (e: InvocationTargetException) {
-                if (e.targetException !is InvalidBitLengthException) throw e
+            val factory = SolidityTypeRegistry.uintFactories["uint$it"]!!
+            factory(upperLimit.minus(BigInteger.ONE))
+            assertFailsWith<InvalidBitLengthException> {
+                factory(upperLimit)
             }
         }
     }
@@ -238,21 +234,11 @@ class SolidityBaseTest {
         (8..256 step 8).forEach {
             val min = BigInteger(2).pow(it - 1).negate()
             val max = BigInteger(2).pow(it - 1) - BigInteger.ONE
-            val constructor = Class.forName(formatClassName(Solidity.types["int$it"]!!)).constructors[0]
-            constructor.newInstance(min)
-            constructor.newInstance(max)
-            try {
-                constructor.newInstance(BigInteger(2).pow(it))
-                fail("Expected IllegalArgumentException")
-            } catch (e: InvocationTargetException) {
-                if (e.targetException !is IllegalArgumentException) throw e
-            }
-
-            try {
-                constructor.newInstance(BigInteger(2).pow(it))
-                fail("Expected IllegalArgumentException")
-            } catch (e: InvocationTargetException) {
-                if (e.targetException !is IllegalArgumentException) throw e
+            val factory = SolidityTypeRegistry.intFactories["int$it"]!!
+            factory(min)
+            factory(max)
+            assertFailsWith<IllegalArgumentException> {
+                factory(BigInteger(2).pow(it))
             }
         }
     }
@@ -332,7 +318,7 @@ class SolidityBaseTest {
 
         assertEquals(
             "6461766500000000000000000000000000000000000000000000000000000000",
-            Solidity.Bytes4("dave".toByteArray()).encode()
+            Solidity.Bytes4("dave".encodeToByteArray()).encode()
         )
     }
 
@@ -355,7 +341,7 @@ class SolidityBaseTest {
 
         assertEquals(
             "64617665",
-            Solidity.Bytes4("dave".toByteArray()).encodePacked()
+            Solidity.Bytes4("dave".encodeToByteArray()).encodePacked()
         )
     }
 
@@ -367,7 +353,7 @@ class SolidityBaseTest {
 
         assertContentEquals(byteArrayOf(0, 1, 2), SolidityBase.decodeStaticBytes("0001020000000000000000000000000000000000000000000000000000000000", 3))
 
-        assertContentEquals("dave".toByteArray(), SolidityBase.decodeStaticBytes("6461766500000000000000000000000000000000000000000000000000000000", 4))
+        assertContentEquals("dave".encodeToByteArray(), SolidityBase.decodeStaticBytes("6461766500000000000000000000000000000000000000000000000000000000", 4))
     }
 
     @Test
@@ -388,7 +374,7 @@ class SolidityBaseTest {
         )
 
         assertEquals(
-            Solidity.Bytes4("dave".toByteArray()),
+            Solidity.Bytes4("dave".encodeToByteArray()),
             Solidity.Bytes4.DECODER.decode(SolidityBase.PartitionData.of("6461766500000000000000000000000000000000000000000000000000000000"))
         )
     }
@@ -397,14 +383,11 @@ class SolidityBaseTest {
     fun testStaticBytesRange() {
         (1..32).forEach { bytesSize ->
             val bytes = ByteArray(bytesSize) { it.toByte() }
-            val constructor = Class.forName(formatClassName(Solidity.types["bytes$bytesSize"]!!)).constructors[0]
-            constructor.newInstance(bytes)
-            try {
-                val oversizedBytes = ByteArray(bytesSize + 1) { it.toByte() }
-                constructor.newInstance(oversizedBytes)
-                fail("Expected IllegalArgumentException")
-            } catch (e: InvocationTargetException) {
-                if (e.targetException !is IllegalArgumentException) throw e
+            val factory = SolidityTypeRegistry.bytesFactories["bytes$bytesSize"]!!
+            factory(bytes)
+            val oversizedBytes = ByteArray(bytesSize + 1) { it.toByte() }
+            assertFailsWith<IllegalArgumentException> {
+                factory(oversizedBytes)
             }
         }
     }
@@ -567,7 +550,7 @@ class SolidityBaseTest {
     fun testDynamicBytesEncoding() {
         assertEquals(
             "000000000000000000000000000000000000000000000000000000000000000d48656c6c6f2c20776f726c642100000000000000000000000000000000000000",
-            Solidity.Bytes("Hello, world!".toByteArray()).encode()
+            Solidity.Bytes("Hello, world!".encodeToByteArray()).encode()
         )
 
         assertEquals(
@@ -587,7 +570,7 @@ class SolidityBaseTest {
 
         assertEquals(
             "00000000000000000000000000000000000000000000000000000000000000046461766500000000000000000000000000000000000000000000000000000000",
-            Solidity.Bytes("dave".toByteArray()).encode()
+            Solidity.Bytes("dave".encodeToByteArray()).encode()
         )
     }
 
@@ -595,7 +578,7 @@ class SolidityBaseTest {
     fun testDynamicBytesPackedEncoding() {
         assertEquals(
             "48656c6c6f2c20776f726c6421",
-            Solidity.Bytes("Hello, world!".toByteArray()).encodePacked()
+            Solidity.Bytes("Hello, world!".encodeToByteArray()).encodePacked()
         )
 
         assertEquals(
@@ -615,14 +598,14 @@ class SolidityBaseTest {
 
         assertEquals(
             "64617665",
-            Solidity.Bytes("dave".toByteArray()).encodePacked()
+            Solidity.Bytes("dave".encodeToByteArray()).encodePacked()
         )
     }
 
     @Test
     fun testDynamicBytesDecoding() {
         assertContentEquals(
-            "Hello, world!".toByteArray(),
+            "Hello, world!".encodeToByteArray(),
             SolidityBase.decodeBytes(SolidityBase.PartitionData.of("000000000000000000000000000000000000000000000000000000000000000d48656c6c6f2c20776f726c642100000000000000000000000000000000000000"))
         )
 
@@ -642,7 +625,7 @@ class SolidityBaseTest {
         )
 
         assertContentEquals(
-            "dave".toByteArray(),
+            "dave".encodeToByteArray(),
             SolidityBase.decodeBytes(SolidityBase.PartitionData.of("00000000000000000000000000000000000000000000000000000000000000046461766500000000000000000000000000000000000000000000000000000000"))
         )
     }
@@ -679,8 +662,8 @@ class SolidityBaseTest {
         val items = listOf(
             Solidity.UInt256(BigInteger.parseString("123", 16)),
             SolidityBase.Vector(uint32s),
-            Solidity.Bytes10("1234567890".toByteArray()),
-            Solidity.Bytes("Hello, world!".toByteArray())
+            Solidity.Bytes10("1234567890".encodeToByteArray()),
+            Solidity.Bytes("Hello, world!".encodeToByteArray())
         )
         val encoded = SolidityBase.encodeTuple(items)
         assertEquals(ENCODED_SOLIDITY_EXAMPLE_TUPLE, encoded, "Encoded string not correct!")
@@ -811,10 +794,6 @@ class SolidityBaseTest {
         )
     }
 
-    private fun formatClassName(clazz: String): String {
-        val index = clazz.lastIndexOf(".")
-        return clazz.replaceRange(index, index + 1, "$")
-    }
 
     private class TestArray<out T : SolidityBase.Type>(items: List<T>, capacity: Int) : SolidityBase.Array<T>(items, capacity) {
 

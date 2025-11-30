@@ -3,9 +3,9 @@ package `by`.alexandr7035.bivkmp.model
 import `by`.alexandr7035.bivkmp.utils.padEndMultiple
 import `by`.alexandr7035.bivkmp.utils.toHex
 import com.ionspin.kotlin.bignum.integer.BigInteger
-import java.lang.Exception
 import kotlin.Boolean
 import kotlin.ByteArray
+import kotlin.Exception
 import kotlin.collections.Map
 
 /**
@@ -1039,7 +1039,7 @@ public object Solidity {
 
     public data class String(
         public val `value`: kotlin.String,
-    ) : Bytes(value.toByteArray()) {
+    ) : Bytes(value.encodeToByteArray()) {
         public class Decoder : SolidityBase.TypeDecoder<String> {
             override fun isDynamic(): Boolean = true
 
