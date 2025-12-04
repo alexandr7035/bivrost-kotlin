@@ -97,3 +97,22 @@ Gradle automatically selects the correct artifact variant based on the target pl
 - Enables multiplatform testing without JVM-specific reflection APIs
 - Maintains the same compact test structure while being KMP-compatible
 - Registry is internal and hidden from library consumers
+
+## KMP Migration Summary
+
+**Migrated to KMP:**
+- `bivkmp-solidity-types`: Full KMP migration (JVM, iOS x64/arm64/simulatorArm64, Linux x64)
+  - Source structure: `commonMain/` + `commonTest/` (was `main/` + `test/`)
+  - Replaced `java.math.BigInteger` → `com.ionspin.kotlin.bignum.integer.BigInteger`
+  - Tests migrated from JUnit → Kotlin Test
+  - Added `SolidityTypeRegistry` for reflection-free type instantiation
+
+**Remained JVM-only:**
+- `bivkmp-abi-parser`: Uses KotlinPoet (JVM-specific)
+- `bivkmp-utils`, `bivkmp-gradle-plugin`, `bivkmp-solidity-types-generator`: Build tools
+
+**Dependency Replacements:**
+- `org.bouncycastle:bcprov` → `org.kotlincrypto.hash:sha3` (KMP)
+- `com.squareup.moshi` → `kotlinx-serialization-json` (KMP)
+- `junit:junit` → `kotlin-test` (KMP)
+- All build scripts migrated: Groovy → Kotlin DSL
