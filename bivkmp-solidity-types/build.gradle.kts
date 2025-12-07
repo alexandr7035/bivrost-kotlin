@@ -11,7 +11,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.bignum)
+            api(libs.bignum)
         }
 
         commonTest.dependencies {
@@ -31,9 +31,5 @@ publishing {
     }
     repositories {
         mavenLocal()
-        maven {
-            name = "repo"
-            url = uri("../repo")
-        }
     }
 }

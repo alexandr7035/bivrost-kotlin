@@ -1,81 +1,107 @@
 package by.alexandr7035.bivkmp.plugin
 
-import com.android.build.gradle.*
-import com.android.build.gradle.api.BaseVariant
-import org.gradle.api.DomainObjectSet
+import by.alexandr7035.bivkmp.AbiParser
+import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.plugins.ExtensionContainer
-import by.alexandr7035.bivkmp.AbiParser
-import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.reflect.KClass
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.*
+import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.register
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import com.android.build.gradle.AppExtension
+import com.android.build.gradle.LibraryExtension
+import javax.inject.Inject
+
+open class BivkmpExtension @Inject constructor(objects: ObjectFactory) {
+    val packageName: Property<String> = objects.property(String::class.java)
+    val abiDir: DirectoryProperty = objects.directoryProperty()
+    val outputDir: DirectoryProperty = objects.directoryProperty()
+}
+
+@Suppress("unused")
+fun Project.bivkmp(configure: BivkmpExtension.() -> Unit) {
+    extensions.configure("bivkmp", configure)
+}
 
 class BivkmpPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        println("Plugin Project: " + project.toString())
-        project.plugins.all {
-            when (it) {
-                is FeaturePlugin -> {
-                    project.extensions[FeatureExtension::class].run {
-                        configureCodeGeneration(project, featureVariants)
-                        configureCodeGeneration(project, libraryVariants)
-                    }
-                }
-                is LibraryPlugin -> {
-                    project.extensions[LibraryExtension::class].run {
-                        configureCodeGeneration(project, libraryVariants)
-                    }
-                }
-                is AppPlugin -> {
-                    project.extensions[AppExtension::class].run {
-                        configureCodeGeneration(project, applicationVariants)
-                    }
-                }
+        val ext = project.extensions.create<BivkmpExtension>("bivkmp")
+
+        ext.abiDir.convention(project.layout.projectDirectory.dir("abi"))
+        ext.outputDir.convention(project.layout.buildDirectory.dir("generated/source/abi/commonMain"))
+
+        val generateTask = project.tasks.register<GenerateAbiWrapperTask>("generateAbiWrapper") {
+            if (!ext.packageName.isPresent) {
+                throw GradleException(
+                    "Bivkmp: packageName is not set in bivkmp extension. " +
+                            "Please configure it in build.gradle.kts:\n\n" +
+                            "bivkmp {\n    packageName.set(\"my.pkg\")\n}"
+                )
+            }
+
+            abiFolder.set(ext.abiDir)
+            outputDir.set(ext.outputDir)
+            packageName.set(ext.packageName)
+        }
+
+        val kmpExt = project.extensions.findByType(KotlinMultiplatformExtension::class.java)
+
+        if (kmpExt != null) {
+            kmpExt.sourceSets.getByName("commonMain").kotlin.srcDir(ext.outputDir)
+            project.logger.lifecycle("Bivkmp: generating ABI wrappers for KMP commonMain")
+        } else {
+            val appExt = project.extensions.findByType(AppExtension::class.java)
+            val libExt = project.extensions.findByType(LibraryExtension::class.java)
+
+            val androidExt = appExt ?: libExt
+            if (androidExt != null) {
+                androidExt.sourceSets.getByName("main").java.srcDir(ext.outputDir)
+                val platformName = if (appExt != null) "Android App" else "Android Library"
+                project.logger.lifecycle("Bivkmp: generating ABI wrappers for $platformName")
+            } else {
+                project.logger.warn("Bivkmp: no KMP or Android extension found, skipping sourceSet registration")
             }
         }
-    }
 
-    private fun configureCodeGeneration(project: Project, variants: DomainObjectSet<out BaseVariant>) {
-        variants.all { variant ->
-            val outputDir = project.buildDir.resolve(
-                    "generated/source/abi/${variant.dirName}")
-            val task = project.tasks.create("by.alexandr7035.generate${variant.name.capitalize()}AbiWrapper")
-            task.outputs.dir(outputDir)
-            variant.registerJavaGeneratingTask(task, outputDir)
-
-            val once = AtomicBoolean()
-            variant.outputs.all { output ->
-
-                val processResources = output.processResourcesProvider.get()
-                task.dependsOn(processResources)
-
-                // Though there might be multiple outputs, their R files are all the same. Thus, we only
-                // need to configure the task once with the R.java input and action.
-                if (once.compareAndSet(false, true)) {
-                    val abiFolder = project.projectDir.resolve("abi")
-
-                    task.apply {
-                        inputs.files(abiFolder.listFiles())
-
-                        doLast {
-                            val packageName = variant.applicationId.removeSuffix(variant.buildType.applicationIdSuffix ?: "")
-                            // We can reuse arrays for all ABIs
-                            val arraysMap = AbiParser.ArraysMap(packageName)
-
-                            abiFolder.listFiles().forEach {
-                                println("Generating wrapper for <$it>")
-                                AbiParser.generateWrapper(packageName, it.readText(), outputDir, arraysMap)
-                            }
-
-                            arraysMap.generate(outputDir)
-                        }
-                    }
-                }
-            }
+        project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class.java).configureEach {
+            dependsOn(generateTask)
         }
     }
+}
 
-    private operator fun <T : Any> ExtensionContainer.get(type: KClass<T>): T {
-        return getByType(type.java)!!
+abstract class GenerateAbiWrapperTask : DefaultTask() {
+    @get:InputDirectory
+    abstract val abiFolder: DirectoryProperty
+
+    @get:OutputDirectory
+    abstract val outputDir: DirectoryProperty
+
+    @get:Input
+    abstract val packageName: Property<String>
+
+    @TaskAction
+    fun generate() {
+        val abiDirFile = abiFolder.asFile.get()
+        if (!abiDirFile.exists()) return
+
+        val out = outputDir.asFile.get()
+        if (out.exists()) out.deleteRecursively()
+        out.mkdirs()
+
+        val files = abiDirFile.listFiles()?.filter { it.isFile } ?: emptyList()
+        if (files.isEmpty()) return
+
+        val arraysMap = AbiParser.ArraysMap(packageName.get())
+
+        files.forEach { file ->
+            logger.lifecycle("Generating wrapper for ${file.name}")
+            AbiParser.generateWrapper(packageName.get(), file.readText(), out, arraysMap)
+        }
+
+        arraysMap.generate(out)
     }
 }

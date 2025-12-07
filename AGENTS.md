@@ -116,3 +116,51 @@ Gradle automatically selects the correct artifact variant based on the target pl
 - `com.squareup.moshi` → `kotlinx-serialization-json` (KMP)
 - `junit:junit` → `kotlin-test` (KMP)
 - All build scripts migrated: Groovy → Kotlin DSL
+
+## Gradle Plugin
+
+### Overview
+
+The `bivkmp-gradle-plugin` generates Kotlin wrapper classes from Solidity ABI JSON files for KMP projects.
+
+**Features:**
+- Generates code to `build/generated/source/abi/commonMain`
+- Registers generated code in `commonMain` (KMP) or `main` (Android) source set
+- Single task `generateAbiWrapper`
+- Configurable via `bivkmp` extension
+
+### Plugin Usage
+
+```kotlin
+// build.gradle.kts
+plugins {
+    id("by.alexandr7035.bivkmp")
+}
+
+bivkmp {
+    packageName.set("com.example.contracts")  // package for generated wrappers
+}
+
+dependencies {
+    implementation("by.alexandr7035:bivkmp-solidity-types:0.1")
+}
+```
+
+### Requirements
+
+- ABI JSON files in `{module}/abi/` directory
+- ABI files must use `contractName` field (camelCase)
+- Dependency: `bivkmp-solidity-types` in `commonMain.dependencies`
+
+## SampleApp Project
+
+### Overview
+
+`SampleApp/` is a Kotlin Multiplatform Compose application demonstrating bivkmp plugin usage.
+
+**Structure:**
+- `SampleApp/composeApp/` - Main KMP module
+- `SampleApp/composeApp/abi/` - ABI JSON files
+- Targets: Android, iOS, Desktop (JVM)
+
+```

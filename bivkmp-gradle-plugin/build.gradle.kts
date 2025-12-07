@@ -1,26 +1,27 @@
 plugins {
-    `java-library`
+    `kotlin-dsl`
+    `java-gradle-plugin`
     `maven-publish`
-    alias(libs.plugins.kotlin.jvm)
 }
 
 dependencies {
-    compileOnly(gradleApi())
     implementation(project(":bivkmp-abi-parser"))
-    implementation(libs.android.gradle.plugin)
+    compileOnly(libs.android.gradle.plugin)
+    compileOnly(libs.kotlin.gradle.plugin)
 }
 
-sourceSets {
-    main {
-        kotlin {
-            srcDir("build/generated/source/abi")
+gradlePlugin {
+    plugins {
+        create("bivkmpPlugin") {
+            id = "by.alexandr7035.bivkmp"
+            implementationClass = "by.alexandr7035.bivkmp.plugin.BivkmpPlugin"
         }
     }
 }
 
 tasks.register<Jar>("sourcesJar") {
     archiveClassifier.set("sources")
-    from(sourceSets.main.get().allSource)
+    from(sourceSets["main"].allSource)
 }
 
 publishing {
@@ -32,9 +33,6 @@ publishing {
     }
     repositories {
         mavenLocal()
-        maven {
-            url = uri("../repo")
-        }
     }
 }
 

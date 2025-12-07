@@ -53,8 +53,5 @@ publishing {
     }
     repositories {
         mavenLocal()
-        maven {
-            url = uri("../repo")
-        }
     }
 }
