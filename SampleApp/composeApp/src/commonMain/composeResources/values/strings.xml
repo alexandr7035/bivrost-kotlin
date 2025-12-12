@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_title">HelloWorld Contract Encoder</string>
+    <string name="encode_description">Encode call to sayHelloWorld() function</string>
+    <string name="encode_button">Encode sayHelloWorld()</string>
+    <string name="encoded_data_label">Encoded Data:</string>
+    <string name="encoded_data_description">This is the ABI-encoded function call that can be sent to the contract.</string>
+    <string name="template_platform">Platform: %1$s</string>
+</resources>
