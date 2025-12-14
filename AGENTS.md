@@ -117,6 +117,16 @@ Gradle automatically selects the correct artifact variant based on the target pl
 - `junit:junit` → `kotlin-test` (KMP)
 - All build scripts migrated: Groovy → Kotlin DSL
 
+## Development instructions
+
+When moving/renaming files: **ALWAYS use `git mv`** to preserve history (shows as `R` in git status, not `D`+`A`).
+
+```bash
+git mv old/path/file.kt new/path/file.kt
+```
+
+If file already exists in new location: check `git status`, remove from index if needed, then use `git mv`.
+
 ## Gradle Plugin
 
 ### Overview
