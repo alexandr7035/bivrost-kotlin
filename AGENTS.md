@@ -137,7 +137,7 @@ plugins {
     id("by.alexandr7035.bivkmp")
 }
 
-bivkmp {
+solidityTypes {
     packageName.set("com.example.contracts")  // package for generated wrappers
 }
 

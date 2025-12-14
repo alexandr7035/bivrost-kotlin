@@ -8,11 +8,11 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
     // Solidity types plugin
-    alias(libs.plugins.bivkmp)
+    alias(libs.plugins.bivkmp.solidity.types)
 }
 
 // Configure package for Solidity contracts wrappers
-bivkmp {
+solidityTypes {
     packageName.set("org.example.project.contracts")
 }
 

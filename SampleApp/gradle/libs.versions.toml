@@ -36,7 +36,7 @@ bivkmp-solidity-types = { module = "by.alexandr7035:bivkmp-solidity-types", vers
 [plugins]
 
 # Solidity types plugin
-bivkmp = { id = "by.alexandr7035.bivkmp", version.ref = "bivkmp"}
+bivkmp-solidity-types = { id = "by.alexandr7035.bivkmp.solidity.types", version.ref = "bivkmp"}
 
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }

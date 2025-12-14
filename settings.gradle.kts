@@ -8,8 +8,8 @@ pluginManagement {
 
 rootProject.name = "bivkmp"
 
-include(":bivkmp-abi-parser")
-include(":bivkmp-gradle-plugin")
+include(":bivkmp-solidity-abi-parser")
 include(":bivkmp-solidity-types")
 include(":bivkmp-solidity-types-generator")
-include(":bivkmp-utils")
+include(":bivkmp-solidity-types-plugin")
+include(":bivkmp-solidity-utils")

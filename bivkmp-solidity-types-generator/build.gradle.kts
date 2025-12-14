@@ -24,13 +24,13 @@ tasks.register<JavaExec>("runSolidityTypeGenerator") {
 
     val commonMainPath = commonMainSrcDirs.first().absolutePath
     val commonTestPath = commonTestSrcDirs.first().absolutePath
-    mainClass.set("by.alexandr7035.bivkmp.SolidityTypeGenerator")
+    mainClass.set("by.alexandr7035.bivkmp.solidity.SolidityTypeGenerator")
     classpath = sourceSets.main.get().runtimeClasspath
     args(commonMainPath, commonTestPath, project.group)
 }
 
 dependencies {
-    implementation(project(":bivkmp-utils"))
+    implementation(project(":bivkmp-solidity-utils"))
     implementation(project(":bivkmp-solidity-types"))
 
     implementation(libs.kotlin.stdlib)
