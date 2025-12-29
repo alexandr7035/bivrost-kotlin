@@ -24,12 +24,8 @@ publishing {
     publications {
         withType<MavenPublication> {
             pom {
-                name.set("swisseth-solidity-types")
-                description.set("Solidity types for Kotlin")
+                description.set("Solidity types for Kotlin Multiplatform")
             }
         }
-    }
-    repositories {
-        mavenLocal()
     }
 }

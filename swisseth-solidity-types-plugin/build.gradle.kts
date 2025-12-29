@@ -15,23 +15,18 @@ gradlePlugin {
         create("solidityTypesPlugin") {
             id = "io.swisseth.solidity.types"
             implementationClass = "io.swisseth.solidity.plugin.SolidityTypesPlugin"
+            displayName = "SwissETH Solidity Types Plugin"
+            description = "Gradle plugin for generating Kotlin wrapper classes from Solidity ABI files"
         }
     }
-}
-
-tasks.register<Jar>("sourcesJar") {
-    archiveClassifier.set("sources")
-    from(sourceSets["main"].allSource)
 }
 
 publishing {
     publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
-            artifact(tasks["sourcesJar"])
+        withType<MavenPublication> {
+            pom {
+                description.set("Gradle plugin for Solidity ABI code generation")
+            }
         }
-    }
-    repositories {
-        mavenLocal()
     }
 }

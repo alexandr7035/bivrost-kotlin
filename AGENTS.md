@@ -36,14 +36,20 @@ Test output shows status for each test (PASSED/FAILED/SKIPPED) configured in `bu
 - **No Reflection**: Tests use automatically generated `SolidityTypeRegistry` instead of Java reflection for type instantiation
 - **Registry Location**: `SolidityTypeRegistry.kt` is generated in `commonTest` source set (internal, test-only)
 
-## Publishing Locally
+## Publishing
+
+### Publishing Configuration
+
+All modules share a common publishing configuration defined in root `build.gradle.kts`:
+- **Repositories**: Maven Local and GitHub Packages
+
+Each module only needs to specify its own description in `pom.description`.
+
+### Publishing to Maven Local
 
 Publish all modules to Maven Local:
 ```bash
-./gradlew :swisseth-solidity-types:publishToMavenLocal \
-          :swisseth-solidity-utils:publishToMavenLocal \
-          :swisseth-solidity-abi-parser:publishToMavenLocal \
-          :swisseth-solidity-types-plugin:publishToMavenLocal --no-daemon
+./gradlew publishToMavenLocal --no-daemon
 ```
 
 Publish single module:
@@ -52,6 +58,42 @@ Publish single module:
 ```
 
 Artifacts are published to `~/.m2/repository/io/swisseth/` directory.
+
+### Publishing to GitHub Packages
+
+Add GitHub settings to `local.properties` (this file is git-ignored):
+```properties
+github.repository=OWNER/REPO
+github.user=your-github-username
+github.token=ghp_your_personal_access_token
+```
+
+Publish all modules to GitHub Packages:
+```bash
+./gradlew publishAllPublicationsToGitHubPackagesRepository --no-daemon
+```
+
+Publish single module:
+```bash
+./gradlew :swisseth-solidity-types:publishAllPublicationsToGitHubPackagesRepository --no-daemon
+```
+
+#### Consuming from GitHub Packages
+
+Add repository in `settings.gradle.kts`:
+```kotlin
+dependencyResolutionManagement {
+    repositories {
+        maven {
+            url = uri("https://maven.pkg.github.com/OWNER/REPO")
+            credentials {
+                username = "..."
+                password = "..."
+            }
+        }
+    }
+}
+```
 
 ### Kotlin Multiplatform Publishing
 
