@@ -6,10 +6,10 @@ pluginManagement {
     }
 }
 
-rootProject.name = "bivkmp"
+rootProject.name = "swisseth"
 
-include(":bivkmp-solidity-abi-parser")
-include(":bivkmp-solidity-types")
-include(":bivkmp-solidity-types-generator")
-include(":bivkmp-solidity-types-plugin")
-include(":bivkmp-solidity-utils")
+include(":swisseth-solidity-abi-parser")
+include(":swisseth-solidity-types")
+include(":swisseth-solidity-types-generator")
+include(":swisseth-solidity-types-plugin")
+include(":swisseth-solidity-utils")

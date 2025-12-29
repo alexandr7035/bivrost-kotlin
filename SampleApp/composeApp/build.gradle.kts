@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
     // Solidity types plugin
-    alias(libs.plugins.bivkmp.solidity.types)
+    alias(libs.plugins.swisseth.solidity.types)
 }
 
 // Configure package for Solidity contracts wrappers
@@ -55,7 +55,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
 
             // Solidity types lib
-            implementation(libs.bivkmp.solidity.types)
+            implementation(libs.swisseth.solidity.types)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

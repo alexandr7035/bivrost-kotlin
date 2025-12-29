@@ -2,16 +2,16 @@
 
 ## Project Overview
 
-**BivKMP Kotlin** generates type-safe Kotlin wrapper classes from Solidity smart contract ABI JSON files. 
+**SwissETH Kotlin** generates type-safe Kotlin wrapper classes from Solidity smart contract ABI JSON files. 
 It automatically creates Kotlin classes with encode/decode methods for contract functions and events.
 
 ### Main Modules
 
-- **bivkmp-solidity-types**: Runtime types for Solidity data types (UInt, Int, Bytes, Address, etc.) - **Kotlin Multiplatform (KMP)**
-- **bivkmp-utils**: Utility functions (hex conversion, Keccak256 hashing)
-- **bivkmp-abi-parser**: Core ABI parsing and Kotlin code generation (uses KotlinPoet)
-- **bivkmp-gradle-plugin**: Android Gradle Plugin integration for automatic code generation
-- **bivkmp-solidity-types-generator**: Standalone generator for Solidity type classes
+- **swisseth-solidity-types**: Runtime types for Solidity data types (UInt, Int, Bytes, Address, etc.) - **Kotlin Multiplatform (KMP)**
+- **swisseth-solidity-utils**: Utility functions (hex conversion, Keccak256 hashing)
+- **swisseth-solidity-abi-parser**: Core ABI parsing and Kotlin code generation (uses KotlinPoet)
+- **swisseth-solidity-types-plugin**: Gradle Plugin integration for automatic code generation
+- **swisseth-solidity-types-generator**: Standalone generator for Solidity type classes
 
 ## Testing
 
@@ -24,8 +24,8 @@ Run all tests:
 
 Run tests for specific module:
 ```bash
-./gradlew :bivkmp-abi-parser:test --no-daemon
-./gradlew :bivkmp-solidity-types:test --no-daemon
+./gradlew :swisseth-solidity-abi-parser:test --no-daemon
+./gradlew :swisseth-solidity-types:test --no-daemon
 ```
 
 Test output shows status for each test (PASSED/FAILED/SKIPPED) configured in `build.gradle` test blocks.
@@ -40,26 +40,25 @@ Test output shows status for each test (PASSED/FAILED/SKIPPED) configured in `bu
 
 Publish all modules to Maven Local:
 ```bash
-./gradlew :bivkmp-solidity-types:publishToMavenLocal \
-          :bivkmp-utils:publishToMavenLocal \
-          :bivkmp-abi-parser:publishToMavenLocal \
-          :bivkmp-gradle-plugin:publishToMavenLocal --no-daemon
+./gradlew :swisseth-solidity-types:publishToMavenLocal \
+          :swisseth-solidity-utils:publishToMavenLocal \
+          :swisseth-solidity-abi-parser:publishToMavenLocal \
+          :swisseth-solidity-types-plugin:publishToMavenLocal --no-daemon
 ```
 
 Publish single module:
 ```bash
-./gradlew :bivkmp-abi-parser:publishToMavenLocal --no-daemon
+./gradlew :swisseth-solidity-abi-parser:publishToMavenLocal --no-daemon
 ```
 
-Artifacts are published to `~/.m2/repository/by/alexandr7035/` directory.
+Artifacts are published to `~/.m2/repository/io/swisseth/` directory.
 
 ### Kotlin Multiplatform Publishing
 
-The `bivkmp-solidity-types` module is published as a multiplatform library:
-- **Main artifact**: `bivkmp-solidity-types` (contains common code and metadata)
+The `swisseth-solidity-types` module is published as a multiplatform library:
+- **Main artifact**: `swisseth-solidity-types` (contains common code and metadata)
 - **Platform-specific artifacts**: 
-  - `bivkmp-solidity-types-jvm` (JVM bytecode)
-  - `bivkmp-solidity-types-linuxx64` (Native Linux klib)
+  - `swisseth-solidity-types-jvm` (JVM bytecode)
   - iOS artifacts (iosX64, iosArm64, iosSimulatorArm64) - published when iOS toolchain is available
 
 Gradle automatically selects the correct artifact variant based on the target platform.
@@ -67,17 +66,16 @@ Gradle automatically selects the correct artifact variant based on the target pl
 ## Key Files
 
 - `build.gradle`: Root project config with version definitions
-- `bivkmp-abi-parser/src/test/resources/automatic_tests/`: test contract scenarios
-- `bivkmp-gradle-plugin/src/main/kotlin/by/alexandr7035/bivkmp/plugin/BivkmpPlugin.kt`: Gradle plugin entry point
+- `swisseth-solidity-abi-parser/src/test/resources/automatic_tests/`: test contract scenarios
+- `swisseth-solidity-types-plugin/src/main/kotlin/io/swisseth/solidity/plugin/SolidityTypesPlugin.kt`: Gradle plugin entry point
 
 ## Architecture Notes
 
 ### Kotlin Multiplatform Support
 
-- **bivkmp-solidity-types** is a Kotlin Multiplatform module supporting:
+- **swisseth-solidity-types** is a Kotlin Multiplatform module supporting:
   - JVM
   - iOS (x64, arm64, simulatorArm64)
-  - Linux (x64)
   
 - **Code Generation**: 
   - `Solidity.kt` is generated in `commonMain` (production code)
@@ -101,15 +99,15 @@ Gradle automatically selects the correct artifact variant based on the target pl
 ## KMP Migration Summary
 
 **Migrated to KMP:**
-- `bivkmp-solidity-types`: Full KMP migration (JVM, iOS x64/arm64/simulatorArm64, Linux x64)
+- `swisseth-solidity-types`: Full KMP migration (JVM, iOS x64/arm64/simulatorArm64)
   - Source structure: `commonMain/` + `commonTest/` (was `main/` + `test/`)
   - Replaced `java.math.BigInteger` → `com.ionspin.kotlin.bignum.integer.BigInteger`
   - Tests migrated from JUnit → Kotlin Test
   - Added `SolidityTypeRegistry` for reflection-free type instantiation
 
 **Remained JVM-only:**
-- `bivkmp-abi-parser`: Uses KotlinPoet (JVM-specific)
-- `bivkmp-utils`, `bivkmp-gradle-plugin`, `bivkmp-solidity-types-generator`: Build tools
+- `swisseth-solidity-abi-parser`: Uses KotlinPoet (JVM-specific)
+- `swisseth-solidity-utils`, `swisseth-solidity-types-plugin`, `swisseth-solidity-types-generator`: Build tools
 
 **Dependency Replacements:**
 - `org.bouncycastle:bcprov` → `org.kotlincrypto.hash:sha3` (KMP)
@@ -131,20 +129,20 @@ If file already exists in new location: check `git status`, remove from index if
 
 ### Overview
 
-The `bivkmp-gradle-plugin` generates Kotlin wrapper classes from Solidity ABI JSON files for KMP projects.
+The `swisseth-solidity-types-plugin` generates Kotlin wrapper classes from Solidity ABI JSON files for KMP projects.
 
 **Features:**
 - Generates code to `build/generated/source/abi/commonMain`
 - Registers generated code in `commonMain` (KMP) or `main` (Android) source set
 - Single task `generateAbiWrapper`
-- Configurable via `bivkmp` extension
+- Configurable via `solidityTypes` extension
 
 ### Plugin Usage
 
 ```kotlin
 // build.gradle.kts
 plugins {
-    id("by.alexandr7035.bivkmp")
+    id("io.swisseth.solidity.types")
 }
 
 solidityTypes {
@@ -152,7 +150,7 @@ solidityTypes {
 }
 
 dependencies {
-    implementation("by.alexandr7035:bivkmp-solidity-types:0.1")
+    implementation("io.swisseth:swisseth-solidity-types:0.1")
 }
 ```
 
@@ -160,13 +158,13 @@ dependencies {
 
 - ABI JSON files in `{module}/abi/` directory
 - ABI files must use `contractName` field (camelCase)
-- Dependency: `bivkmp-solidity-types` in `commonMain.dependencies`
+- Dependency: `swisseth-solidity-types` in `commonMain.dependencies`
 
 ## SampleApp Project
 
 ### Overview
 
-`SampleApp/` is a Kotlin Multiplatform Compose application demonstrating bivkmp plugin usage.
+`SampleApp/` is a Kotlin Multiplatform Compose application demonstrating SwissETH plugin usage.
 
 **Structure:**
 - `SampleApp/composeApp/` - Main KMP module

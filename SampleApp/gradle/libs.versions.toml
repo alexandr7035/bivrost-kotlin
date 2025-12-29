@@ -15,7 +15,7 @@ junit = "4.13.2"
 kotlin = "2.2.21"
 kotlinx-coroutines = "1.10.2"
 
-bivkmp = "0.1"
+swisseth = "0.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -31,12 +31,12 @@ androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle
 kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 
 # Solidity types lib
-bivkmp-solidity-types = { module = "by.alexandr7035:bivkmp-solidity-types", version.ref="bivkmp"}
+swisseth-solidity-types = { module = "io.swisseth:swisseth-solidity-types", version.ref="swisseth"}
 
 [plugins]
 
 # Solidity types plugin
-bivkmp-solidity-types = { id = "by.alexandr7035.bivkmp.solidity.types", version.ref = "bivkmp"}
+swisseth-solidity-types = { id = "io.swisseth.solidity.types", version.ref = "swisseth"}
 
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }

@@ -49,9 +49,9 @@ in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and r
 
 Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
 
-## BivKMP Plugin - Solidity Contract Wrappers
+## SwissETH Plugin - Solidity Contract Wrappers
 
-This project uses the **BivKMP** Gradle plugin to automatically generate type-safe Kotlin wrapper classes from Solidity smart contract ABI JSON files.
+This project uses the **SwissETH** Gradle plugin to automatically generate type-safe Kotlin wrapper classes from Solidity smart contract ABI JSON files.
 
 **Configuration:**
 - ABI files are located in [`composeApp/abi/`](./composeApp/abi/)
@@ -73,6 +73,6 @@ This project uses the **BivKMP** Gradle plugin to automatically generate type-sa
 The project includes a sample contract `HelloWorld.json` that demonstrates encoding a function call. See [`App.kt`](./composeApp/src/commonMain/kotlin/org/example/project/App.kt) for usage example.
 
 **Dependencies:**
-- `by.alexandr7035:bivkmp-solidity-types` - Runtime types for Solidity data types (KMP-compatible)
-- `by.alexandr7035.bivkmp` - Gradle plugin for code generation`  
+- `io.swisseth:swisseth-solidity-types` - wrapper classes for Solidity data types (KMP-compatible)
+- `io.swisseth.solidity.types` - Gradle plugin for code generation  
 
