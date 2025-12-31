@@ -207,7 +207,7 @@ object AbiParser {
             .returns(String::class)
             .addModifiers(KModifier.OVERRIDE)
             .addStatement(
-                "throw·UnsupportedOperationException(\"Structs are  not supported via encodePacked\")"
+                "throw·UnsupportedOperationException(\"Structs are not supported via encodePacked\")"
             )
             .build()
 

@@ -35,7 +35,7 @@ public class Abi13 {
     ) : SolidityBase.StaticType {
         override fun encode(): String = SolidityBase.encodeFunctionArguments(x, y)
 
-        override fun encodePacked(): String = throw UnsupportedOperationException("Structs are  not supported via encodePacked")
+        override fun encodePacked(): String = throw UnsupportedOperationException("Structs are not supported via encodePacked")
 
         public class Decoder : SolidityBase.TypeDecoder<TupleA> {
             override fun isDynamic(): Boolean = false
