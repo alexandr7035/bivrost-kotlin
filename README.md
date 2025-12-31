@@ -2,7 +2,7 @@
 
 Type-safe Kotlin Multiplatform wrappers for Solidity ABI encoding and decoding.
 
-A refreshed KMP fork of [Gnosis's Bivrost](https://github.com/5afe/bivrost-kotlin).
+A refreshed KMP fork of [Safe's Bivrost](https://github.com/5afe/bivrost-kotlin).
 
 ## Overview
 SwissETH Solidity allows you to:
@@ -11,6 +11,7 @@ SwissETH Solidity allows you to:
 - Encode / decode smart contract calls
 - Use the same API across `Android` / `iOS` / `JVM`
 
+Solidity:
 ```solidity
 contract HelloWorld {
     function sayHelloWorld() public pure returns (string memory) {
@@ -27,6 +28,7 @@ contract HelloWorld {
 }
 ```
 
+Kotlin:
 ```kotlin
 val helloWorldEncoded = HelloWorld.SayHelloWorld.encode()
 
@@ -48,8 +50,6 @@ The encoded data can be easily passed as `String` to any Ethereum client.
 ### 1. Add repositories
 
 In your `settings.gradle.kts`, add GitHub Packages repository with credentials to both `pluginManagement` and `dependencyResolutionManagement`:
-
-> ⚠️ GitHub Packages requires authentication even for public packages
 
 ```kotlin
 pluginManagement {
@@ -80,6 +80,7 @@ dependencyResolutionManagement {
     }
 }
 ```
+> ⚠️ GitHub Packages requires authentication even for public packages
 
 For local development, you can use `mavenLocal()` instead (publish with `./gradlew publishToMavenLocal`).
 
@@ -193,4 +194,4 @@ Open `SampleApp` directory as a separate project to run the app or check the sou
 </p>
 
 ## License
-Licensed under the Apache License 2.0, same as the forked project. See [LICENSE](LICENSE) file for details.
+Licensed under the **Apache License 2.0**, same as the [original](https://github.com/5afe/bivrost-kotlin) project. See [LICENSE](LICENSE) file for details.
