@@ -1,0 +1,39 @@
+[versions]
+
+kotlin = "2.2.0"
+androidPlugin = "8.13.1"
+
+kotlinPoet = "2.2.0"
+kotlinxSerialization = "1.8.1"
+kotlincrypto = "0.8.0"
+bignum = "0.3.8"
+
+[libraries]
+# Kotlin
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+
+# Code generation
+kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet" }
+
+# JSON
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+
+# Cryptography
+kotlincrypto-bom = { module = "org.kotlincrypto.hash:bom", version.ref = "kotlincrypto" }
+kotlincrypto-sha3 = { module = "org.kotlincrypto.hash:sha3", version.ref = "kotlincrypto" }
+
+# Testing
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+
+# BigNum multiplatform
+bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
+
+# Android
+android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "androidPlugin" }
+
+[plugins]
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

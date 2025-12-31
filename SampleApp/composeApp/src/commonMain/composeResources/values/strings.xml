@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_title">HelloWorld Contract Encoder</string>
+    <string name="encode_description">Encode calls to HelloWorld contract</string>
+    <string name="encode_sayhello_button">Encode sayHelloWorld()</string>
+    <string name="encode_sum_button">Encode sum(a, b)</string>
+    <string name="encode_sayhelloto_button">Encode sayHelloTo(name)</string>
+    <string name="encoded_data_label">Encoded Data:</string>
+    <string name="encoded_data_description">This is the ABI-encoded function call that can be sent via eth_call</string>
+    <string name="template_platform">Platform: %1$s</string>
+</resources>
